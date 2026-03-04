@@ -1,0 +1,122 @@
+@font-face {
+    font-family: "MyFont";
+    src: url(../fonts/jf-openhuninn-2.1.ttf);
+  }
+  
+body {
+    font-family: "MyFont";
+    background-color: #f7f7f7;
+    color: #333;
+    margin: 24px;
+}
+
+h1 {
+    font-size: 1.2rem;  
+    margin-bottom: 16px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+    font-size: 0.9rem;
+}
+
+table thead th {
+    text-align: left;
+    font-weight: 600;
+    padding: 6px 10px;
+    border-bottom: 2px solid #ddd;
+    color: #555;
+    white-space: nowrap;
+}
+
+table tbody td {
+    padding: 8px 10px;
+    border-bottom: 1px solid #eee;
+    vertical-align: middle;
+}
+
+table tbody tr:hover {
+    background-color: #f2f2f2;
+}
+
+.id-col {
+    text-align: left;
+    color: #999;
+    font-size: 0.75rem;
+}
+
+.work-color {
+    width: 6px;
+    padding: 0;
+}
+
+.date-col {
+    width: 80px;
+    text-align: center;
+}
+
+.ship-mark {
+    color: #333;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.category-col {
+    font-size: 0.75rem;
+    color: #aaa;
+    width: 100px;
+}
+
+.amount {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+  
+.amount.paid {
+    color: #2c7;
+}
+
+.amount.unpaid {
+    color: #c33;
+}
+
+.same-order {
+    background-color: #fafafa;
+}
+  
+.same-order::before {
+    content: "✓";
+    color: #999;
+    margin-right: 4px;
+}
+
+.container {
+    width: 800px;
+    margin: 40px auto;
+    font-family: sans-serif;
+}
+  
+.form-group {
+    margin-bottom: 15px;
+}
+  
+label {
+    display: inline-block;
+    width: 80px;
+    font-size: 0.9rem;
+}
+  
+input, select {
+    padding: 5px;
+    width: 250px;
+}
+  
+button {
+    padding: 6px 12px;
+    background: #2a6f9d;
+    border: none;
+    color: white;
+    cursor: pointer;
+}

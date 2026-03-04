@@ -1,9 +1,9 @@
 package com.example.goods_tracker.entity;
 import jakarta.persistence.*;
 import lombok.Data;
-
 import java.time.LocalDate;
 import java.math.BigDecimal;
+
 @Data
 @Entity
 @Table(name = "purchase")
