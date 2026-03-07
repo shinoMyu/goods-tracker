@@ -68,6 +68,20 @@ table tbody tr:hover {
     text-align: left;
 }
 
+.amount{
+    cursor: pointer;
+}
+
+.payment-popover{
+    position:absolute;
+    background:white;
+    padding:8px;
+    font-size:0.8rem;
+    border:1px solid #a8a7a7;
+    border-radius: 5%;
+    box-shadow:0 2px 8px rgba(0,0,0,0.1);
+}
+
 .ship-mark {
     color: #333;
     font-weight: bold;
@@ -113,10 +127,21 @@ input, select {
     border-radius: 6px;
 }
   
-.form-group input:focus, 
-.form-group select:focus {
-    border-color: #236c96;
-    box-shadow: 0 0 0 3px rgba(42, 115, 157, 0.1);
+.form-group select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+  
+    font-size: 1rem;
+    color: #333;
+    cursor: pointer;
+}
+
+.form-group select:invalid {
+    color: #999;
+}
+.form-group select option[value=""] {
+    display: none;
 }
 
 select {
@@ -130,10 +155,30 @@ select {
     background-size: 10px;
 }
 
+input[type="month"] {
+    color: #333; 
+    appearance: none; 
+    -webkit-appearance: none;
+}
+
+input[type="month"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.6; 
+    margin-right: -5px;
+}
+
+input[type="month"]:invalid {
+    color: #999; 
+}
+
 input[type=number]::-webkit-inner-spin-button,
 input[type=number]::-webkit-outer-spin-button {
     -webkit-appearance: none;
     margin: 0;
+}
+
+input[type=number] {
+    -moz-appearance: textfield;
 }
 
 button[type="submit"] {

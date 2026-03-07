@@ -17,7 +17,6 @@
       <th>日期</th>
       <th>名稱</th>
       <th>金額</th>
-      <!-- <th>付款來源</th> -->
       <th>狀態</th>
       <th class="category-col">分類</th>
     </tr>
@@ -29,8 +28,7 @@
       <td class="work-color" th:attr="data-work=${p.workTitle}" th:title="${p.workTitle}"></td>
       <td class="date-col" th:text="${#temporals.format(p.purchaseDate, 'yyyy-MM')}"></td>
       <td th:text="${p.itemName}"></td>
-      <td th:text="${p.totalPrice}"></td>
-      <!-- <td th:text="${p.paymentSource}"></td> -->
+      <td class="amount" th:attr="data-id=${p.id}" th:text="${p.totalPrice}"></td>
       <!-- <td th:text="${p.received ? '✓' : ''}"></td> -->
       <td>
         <span
@@ -48,5 +46,6 @@
 
 <script th:src="@{/js/workColor.js}" defer></script>
 <!-- <script th:src="@{/js/shippingMark.js}" defer></script> -->
+<script th:src="@{/js/paymentPopover.js}" defer></script>
 </body>
 </html>
