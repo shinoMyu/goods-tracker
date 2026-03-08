@@ -1,35 +1,35 @@
-// document.addEventListener("DOMContentLoaded", () => {
-//     const colorMap = {
-//       "さらざんまい": "#f6c1cc",
-//       "ナカノヒトゲノム": "#b6e3c6",
-//       "其他作品": "#cfd8dc"
-//     };
+document.querySelectorAll(".work-color").forEach(cell => {
+
+  const color = cell.dataset.color;
+  const received = cell.dataset.received === "true";
+  // 初始化顏色
+  if (color && received) {
+    cell.style.background = color;
+  }
   
-//     document.querySelectorAll(".work-color").forEach(el => {
-//       const work = el.dataset.work;
-//       el.style.backgroundColor = colorMap[work] ?? "#eee";
-//     });
-//   });
-
-document.addEventListener("DOMContentLoaded", () => {
-  const colorPool = [
-    "#e57373", "#64b5f6", "#81c784",
-    "#ba68c8", "#ffb74d", "#4db6ac",
-    "#9575cd", "#f4a261", "#2a9d8f",
-    "#e76f51", "#457b9d", "#8d99ae"
-  ];
-
-  const workColorMap = {};
-  let colorIndex = 0;
-
-  document.querySelectorAll(".work-color").forEach(cell => {
-    const work = cell.dataset.work || "unknown";
-
-    if (!workColorMap[work]) {
-      workColorMap[work] = colorPool[colorIndex % colorPool.length];
-      colorIndex++;
-    }
-
-    cell.style.backgroundColor = workColorMap[work];
+  cell.addEventListener("click", () => {
+    // 已經有顏色就不允許修改
+    if (cell.dataset.color) {
+      return;
+    }       
+    const workId = cell.dataset.workId;
+    const input = document.createElement("input");
+    input.type = "color";
+    input.addEventListener("input", async () => {
+      const color = input.value;
+      // 更新畫面
+      cell.style.background = color;
+      // 存入資料庫
+      await fetch(`/work/${workId}/color`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          color: color
+        })
+      });      
+    });
+    input.click(); 
   });
 });

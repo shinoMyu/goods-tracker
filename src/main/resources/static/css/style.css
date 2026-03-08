@@ -11,10 +11,41 @@ body {
     padding: 30px;
 }
 
-h1 {
-    font-size: 1.4rem;  
-    margin-bottom: 25px;
+input, select, button, textarea {
+    font-family: "MyFont";
+    box-sizing: border-box; 
+}
+
+.header {
+    position: relative;
+    margin: 25px;
+}
+
+.header h1 {
+    font-size: 1.4rem;
     text-align: center;
+}
+
+.btn-add {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+a[href*="/new"], a[href*="/view"], a[href*="/purchases"] {
+    text-decoration: none;
+    color: #6c757d;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    margin-top: 20px;
+    transition: color 0.2s;
+}
+
+a[href*="/new"]:hover, a[href*="/view"]:hover, a[href*="/purchases"]:hover {
+    color: #2a739d;
+    text-decoration: underline;
 }
 
 table {
@@ -53,14 +84,24 @@ table tbody tr:hover {
 }
 
 .id-col {
-    text-align: left;
     color: #adb5bd;
     font-size: 0.8rem;
-    width: 40px;}
+    width: 40px;
+}
+
+.work-color-col{
+    width: 8px;
+    padding: 8px;
+    font-size: 0.65rem;
+    text-align: center;
+}
 
 .work-color {
-    width: 6px;
-    padding: 0;
+    cursor: pointer;
+}
+
+.work-color:hover{
+    background:#bbc1c869;
 }
 
 .date-col {
@@ -102,6 +143,12 @@ table tbody tr:hover {
     border-radius: 12px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.08); 
 }
+
+.container h1 {
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 1.4rem;
+}
   
 .form-group {
     margin-bottom: 20px;
@@ -110,21 +157,27 @@ table tbody tr:hover {
     justify-content: center;
 }
   
-label {
+.form-group label {
     width: 70px;
-    font-size: 0.95rem;
+    font-size: 1rem;
     font-weight: 500;
     text-align: center; 
     margin-right: 16px;
     flex-shrink: 0; 
 }
   
-input, select {
+.form-group input, .form-group select {
     flex-grow: 1; 
     padding: 10px 14px;
     font-size: 1rem;
     border: 1px solid #ddd;
     border-radius: 6px;
+}
+
+.form-group input:focus, .form-group select:focus {
+    border-color: #236c96;
+    box-shadow: 0 0 0 3px rgba(42, 115, 157, 0.1);
+    outline: none;
 }
   
 .form-group select {
@@ -142,17 +195,6 @@ input, select {
 }
 .form-group select option[value=""] {
     display: none;
-}
-
-select {
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-  
-    background-image: url("data:image/svg+xml;utf8,<svg fill='gray' height='20' viewBox='0 0 20 20' width='20' xmlns='http://www.w3.org/2000/svg'><polygon points='0,0 20,0 10,10'/></svg>");
-    background-repeat: no-repeat;
-    background-position: right 10px center;
-    background-size: 10px;
 }
 
 input[type="month"] {
@@ -202,19 +244,4 @@ button[type="submit"]:hover {
 
 button[type="submit"]:active {
     transform: scale(0.98);
-}
-
-a[href*="/new"], a[href*="/view"], a[href*="/purchases"] {
-    text-decoration: none;
-    color: #6c757d;
-    font-size: 0.9rem;
-    display: inline-flex;
-    align-items: center;
-    margin-top: 20px;
-    transition: color 0.2s;
-}
-
-a[href*="/new"], a[href*="/view"]:hover, a[href*="/purchases"]:hover {
-    color: #2a739d;
-    text-decoration: underline;
 }

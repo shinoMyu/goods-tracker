@@ -7,45 +7,54 @@
 </head>
 <body>
 
-<h1>購買紀錄</h1>
+  <div class="header">
+    <h1>グッズ購買紀錄</h1>
+    <a href="/purchases/new" class="btn-add">新增購買</a>
+  </div>  
 
-<table>
-  <thead>
-    <tr>
-      <th class="id-col">#</th>
-      <th class="work-color-col"></th>
-      <th>日期</th>
-      <th>名稱</th>
-      <th>金額</th>
-      <th>狀態</th>
-      <th class="category-col">分類</th>
-    </tr>
-  </thead>
+  <table>
+    <thead>
+      <tr>
+        <th class="id-col">#</th>
+        <th class="work-color-col" title="作品">■</th>
+        <th>日期</th>
+        <th>名稱</th>
+        <th>金額</th>
+        <th>狀態</th>
+        <th class="category-col">分類</th>
+      </tr>
+    </thead>
 
-  <tbody>
-    <tr th:each="p : ${purchases}">
-      <td class="id-col" th:text="${p.id}"></td>
-      <td class="work-color" th:attr="data-work=${p.workTitle}" th:title="${p.workTitle}"></td>
-      <td class="date-col" th:text="${#temporals.format(p.purchaseDate, 'yyyy-MM')}"></td>
-      <td th:text="${p.itemName}"></td>
-      <td class="amount" th:attr="data-id=${p.id}" th:text="${p.totalPrice}"></td>
-      <!-- <td th:text="${p.received ? '✓' : ''}"></td> -->
-      <td>
-        <span
-          class="ship-mark"
-          th:attr="data-order=${p.orderId}"
-          th:text="${p.received} ? '✓' : ''">
-        </span>
-      </td>
-      <td class="category-col" th:text="${p.category}"></td>
-    </tr>
-  </tbody>
-</table>
+    <tbody>
+      <tr th:each="p : ${purchases}">
+        <td class="id-col" th:text="${p.id}"></td>
+        <td class="work-color"
+          th:data-work-id="${p.work.id}"
+          th:data-color="${p.work.color}"
+          th:data-received="${p.received}"
+          th:title="${p.work.title}"></td>
+        <td class="date-col" th:text="${#temporals.format(p.purchaseDate, 'yyyy-MM')}"></td>
+        <td th:text="${p.itemName}"></td>
+        <td class="amount" th:attr="data-id=${p.id}" th:text="${p.totalPrice}"></td>
+        <!-- <td th:text="${p.received ? '✓' : ''}"></td> -->
+        <td>
+          <span
+            class="ship-mark"
+            th:attr="data-order=${p.orderId}"
+            th:text="${p.received} ? '✓' : ''">
+          </span>
+        </td>
+        <td class="category-col" th:text="${p.category}"></td>
+      </tr>
 
-<a href="/purchases/new">新增購買</a>
+      <tr th:if="${#lists.isEmpty(purchases)}">
+        <td colspan="8">No purchases yet</td>
+      </tr>
+    </tbody>
+  </table>
 
-<script th:src="@{/js/workColor.js}" defer></script>
-<!-- <script th:src="@{/js/shippingMark.js}" defer></script> -->
-<script th:src="@{/js/paymentPopover.js}" defer></script>
+  <script th:src="@{/js/workColor.js}" defer></script>
+  <!-- <script th:src="@{/js/shippingMark.js}" defer></script> -->
+  <script th:src="@{/js/paymentPopover.js}" defer></script>
 </body>
 </html>

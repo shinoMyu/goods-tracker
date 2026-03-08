@@ -27,7 +27,10 @@
     
       <div class="form-group">
         <label>作品</label>
-        <input type="text" th:field="*{workTitle}">
+        <input list="works" name="workTitle">
+        <datalist id="works">
+          <option th:each="w : ${works}" th:value="${w.title}"></option>
+        </datalist>
       </div>
     
       <div class="form-group">

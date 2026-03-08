@@ -16,10 +16,13 @@ public class Purchase {
     private LocalDate purchaseDate;
     private String itemName;
     private String category;
-    private String workTitle;
     private BigDecimal totalPrice;
     private String paymentSource;
     private String purchaseType;
     private Boolean received;
     private String note;
+
+    @ManyToOne
+    @JoinColumn(name = "work_id")
+    private Work work;
 }
