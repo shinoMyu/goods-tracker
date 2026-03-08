@@ -90,18 +90,42 @@ table tbody tr:hover {
 }
 
 .work-color-col{
-    width: 8px;
-    padding: 8px;
+    width: 10px;
+    padding: 10px;
     font-size: 0.65rem;
     text-align: center;
 }
 
 .work-color {
+    padding: 0;
     cursor: pointer;
+    position: relative;
 }
 
 .work-color:hover{
     background:#bbc1c869;
+}
+
+.color-popover{
+    position:absolute;
+    top:100%;
+    left:50%;
+    transform:translateX(-50%);
+    background:white;
+    border:1px solid #aaa;
+    padding:3px;
+    font-size:0.7rem;
+    box-shadow:0 2px 6px rgba(0,0,0,0.1);
+}
+
+.color-confirm{
+    border:none;
+    background:#3e8bb8;
+    color:white;
+    font-size:0.7rem;
+    padding:2px 6px;
+    cursor:pointer;
+    border-radius:3px;
 }
 
 .date-col {
