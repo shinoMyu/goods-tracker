@@ -12,6 +12,7 @@ public class Payment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private BigDecimal paidAmount;
+    private String paymentType;
     private String note;
 
     @ManyToOne

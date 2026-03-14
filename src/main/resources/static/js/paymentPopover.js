@@ -1,3 +1,8 @@
+const paymentTypeMap = {
+    deposit: "訂金",
+    balance: "尾款"
+};
+
 const sourceMap = {
     father: "父",
     mother: "母",
@@ -23,15 +28,23 @@ document.querySelectorAll(".amount").forEach(cell => {
 
         const res = await fetch(`/payment/purchase/${id}`);
         const payments = await res.json();
-
+        if (payments.length === 1 && payments[0].paymentType === "deposit") {
+            const amountText = cell.textContent;
+            if (!amountText.includes("(訂金)")) {
+                cell.textContent = amountText + "(訂金)";
+            }
+        }
+        
         let html = "";
 
         payments.forEach(p => {
+            const type = paymentTypeMap[p.paymentType];
+
             if (p.note) {
-                html += `<div>${p.paidAmount} ${p.note}</div>`;
+                html += `<div>${type}：${p.paidAmount} (${p.note})</div>`;
             } else {
-                html += `<div>${p.paidAmount}</div>`;
-            }  
+                html += `<div>${type}：${p.paidAmount}</div>`;
+            }
         });
 
         if (payments.length > 0) {

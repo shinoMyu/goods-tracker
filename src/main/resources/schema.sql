@@ -30,6 +30,7 @@ CREATE TABLE IF NOT EXISTS payment (
     id INT AUTO_INCREMENT PRIMARY KEY,
     purchase_id INT NOT NULL,
     paid_amount DECIMAL(10,2) NOT NULL,
+    payment_type ENUM('deposit','balance'),
     note VARCHAR(255),
 
     FOREIGN KEY (purchase_id) REFERENCES purchase(id)

@@ -1,19 +1,22 @@
 @font-face {
     font-family: "MyFont";
     src: url(../fonts/jf-openhuninn-21.woff2);
-  }
-  
+}
+
 body {
     font-family: "MyFont";
     background-color: #f7f7f7;
     color: #333;
-    margin: 0; 
+    margin: 0;
     padding: 30px;
 }
 
-input, select, button, textarea {
+input,
+select,
+button,
+textarea {
     font-family: "MyFont";
-    box-sizing: border-box; 
+    box-sizing: border-box;
 }
 
 .header {
@@ -31,19 +34,28 @@ input, select, button, textarea {
     right: 0;
     top: 50%;
     transform: translateY(-50%);
+    padding: 6px 12px;
+    border: 1px solid #cecece;
+    border-radius: 8px;
+    background: white;
+    font-weight: 600;
 }
 
-a[href*="/new"], a[href*="/view"], a[href*="/purchases"] {
+.btn-add:hover{
+    background:#e9e6e6e1;
+    color:#666c74;
+    text-decoration: none;
+}
+
+a {
     text-decoration: none;
     color: #6c757d;
-    font-size: 0.9rem;
-    display: inline-flex;
-    align-items: center;
+    font-size: 0.95rem;
     margin-top: 20px;
     transition: color 0.2s;
 }
 
-a[href*="/new"]:hover, a[href*="/view"]:hover, a[href*="/purchases"]:hover {
+a:hover {
     color: #2a739d;
     text-decoration: underline;
 }
@@ -53,7 +65,7 @@ table {
     border-collapse: collapse;
     background-color: white;
     font-size: 0.9rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     margin-bottom: 25px;
 }
 
@@ -89,7 +101,7 @@ table tbody tr:hover {
     width: 40px;
 }
 
-.work-color-col{
+.work-color-col {
     width: 10px;
     padding: 10px;
     font-size: 0.65rem;
@@ -102,30 +114,30 @@ table tbody tr:hover {
     position: relative;
 }
 
-.work-color:hover{
-    background:#bbc1c869;
+.work-color:hover {
+    background: #bbc1c869;
 }
 
-.color-popover{
-    position:absolute;
-    top:100%;
-    left:50%;
-    transform:translateX(-50%);
-    background:white;
-    border:1px solid #aaa;
-    padding:3px;
-    font-size:0.7rem;
-    box-shadow:0 2px 6px rgba(0,0,0,0.1);
+.color-popover {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: white;
+    border: 1px solid #aaa;
+    padding: 3px;
+    font-size: 0.7rem;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
-.color-confirm{
-    border:none;
-    background:#3e8bb8;
-    color:white;
-    font-size:0.7rem;
-    padding:2px 6px;
-    cursor:pointer;
-    border-radius:3px;
+.color-confirm {
+    border: none;
+    background: #3e8bb8;
+    color: white;
+    font-size: 0.7rem;
+    padding: 2px 6px;
+    cursor: pointer;
+    border-radius: 3px;
 }
 
 .date-col {
@@ -133,18 +145,18 @@ table tbody tr:hover {
     text-align: left;
 }
 
-.amount{
+.amount {
     cursor: pointer;
 }
 
-.payment-popover{
-    position:absolute;
-    background:white;
-    padding:8px;
-    font-size:0.8rem;
-    border:1px solid #a8a7a7;
+.payment-popover {
+    position: absolute;
+    background: white;
+    padding: 8px;
+    font-size: 0.8rem;
+    border: 1px solid #a8a7a7;
     border-radius: 5%;
-    box-shadow:0 2px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .ship-mark {
@@ -165,7 +177,7 @@ table tbody tr:hover {
     background: white;
     padding: 40px;
     border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.08); 
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
 }
 
 .container h1 {
@@ -173,68 +185,77 @@ table tbody tr:hover {
     margin-bottom: 30px;
     font-size: 1.4rem;
 }
-  
+
+.form-error {
+    color: #b00020;
+    background: #fdecea;
+    border: 1px solid #f5c2c0;
+    padding: 8px 12px;
+    margin: 0 0 16px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    text-align: center;
+}
+
 .form-group {
     margin-bottom: 20px;
-    display: flex; 
-    align-items: center; 
+    display: flex;
+    align-items: center;
     justify-content: center;
 }
-  
+
 .form-group label {
     width: 70px;
     font-size: 1rem;
     font-weight: 500;
-    text-align: center; 
+    text-align: center;
     margin-right: 16px;
-    flex-shrink: 0; 
+    flex-shrink: 0;
 }
-  
-.form-group input, .form-group select {
-    flex-grow: 1; 
+
+.form-group input,
+.form-group select {
+    flex-grow: 1;
     padding: 10px 14px;
     font-size: 1rem;
     border: 1px solid #ddd;
     border-radius: 6px;
 }
 
-.form-group input:focus, .form-group select:focus {
+.form-group input:focus,
+.form-group select:focus {
     border-color: #236c96;
     box-shadow: 0 0 0 3px rgba(42, 115, 157, 0.1);
     outline: none;
 }
-  
+
 .form-group select {
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
-  
-    font-size: 1rem;
+
     color: #333;
     cursor: pointer;
 }
 
-.form-group select:invalid {
-    color: #999;
-}
 .form-group select option[value=""] {
     display: none;
 }
 
 input[type="month"] {
-    color: #333; 
-    appearance: none; 
+    color: #333;
+    appearance: none;
     -webkit-appearance: none;
 }
 
 input[type="month"]::-webkit-calendar-picker-indicator {
     cursor: pointer;
-    opacity: 0.6; 
+    opacity: 0.6;
     margin-right: -5px;
 }
 
 input[type="month"]:invalid {
-    color: #999; 
+    color: #999;
 }
 
 input[type=number]::-webkit-inner-spin-button,
@@ -245,6 +266,52 @@ input[type=number]::-webkit-outer-spin-button {
 
 input[type=number] {
     -moz-appearance: textfield;
+}
+
+#paymentOptions {
+    width: 190px;
+}
+
+#paymentOptions label {
+    margin: 5px;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+#paymentOptions label:has(input:checked) {
+    font-weight: bold;
+}
+
+#installmentBox {
+    width: 335px;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 10px;
+}
+
+#installmentBox input {
+    width: 101px;
+}
+
+.total {
+    margin-top: 17px;
+    font-size: 0.8rem;
+    color: #555;
+    display: flex;
+    white-space: nowrap;
+}
+
+#totalPreview {
+    min-width: 60px;
+}
+
+#paymentOptions.installment-mode label {
+    font-size: 0.8rem;
+    margin: 3px;
+}
+
+#paymentOptions.installment-mode input[type="radio"] {
+    transform: scale(0.85);
 }
 
 button[type="submit"] {
@@ -268,4 +335,9 @@ button[type="submit"]:hover {
 
 button[type="submit"]:active {
     transform: scale(0.98);
+}
+
+.form-footer {
+    display: flex;
+    justify-content: space-between;
 }

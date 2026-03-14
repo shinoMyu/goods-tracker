@@ -5,39 +5,56 @@
   <link rel="stylesheet" th:href="@{/css/style.css}">
   <title>New Purchase</title>
 </head>
+
 <body>
-
   <div class="container">
-
     <h1>新增購買紀錄</h1>
-    
-    <form th:action="@{/purchases}"
-          th:object="${purchase}"
-          method="post">
-    
+
+    <p class="form-error" th:if="${error}" th:text="${error}"></p>
+    <form th:action="@{/purchases}" th:object="${purchase}" method="post">
+
       <div class="form-group">
         <label>日期</label>
-        <input type="month" th:field="*{purchaseDate}">
+        <input type="month" name="purchaseMonth" th:value="${#temporals.format(purchase.purchaseDate, 'yyyy-MM')}"
+          th:min="${#temporals.format(minDate, 'yyyy-MM')}" required>
       </div>
-    
+
       <div class="form-group">
         <label>名稱</label>
-        <input type="text" th:field="*{itemName}">
+        <input type="text" th:field="*{itemName}" required>
       </div>
-    
+
       <div class="form-group">
         <label>作品</label>
-        <input list="works" name="workTitle">
+        <input list="works" name="workTitle" placeholder="輸入或選擇作品" required>
         <datalist id="works">
           <option th:each="w : ${works}" th:value="${w.title}"></option>
         </datalist>
       </div>
-    
+
+      <div class="form-group">
+        <label>種類</label>
+        <input list="categories" th:field="*{category}" placeholder="輸入或選擇種類" required>
+        <datalist id="categories">
+          <option th:each="c : ${categories}" th:value="${c}"></option>
+        </datalist>
+      </div>
+
       <div class="form-group">
         <label>金額</label>
-        <input type="number" step="0.01" th:field="*{totalPrice}">
+        <input type="number" step="0.01" min="0" id="amountInput" th:field="*{totalPrice}">
+        <div id="installmentBox" style="display:none">
+          <input type="number" step="0.01" min="0" id="depositInput" name="deposit" placeholder="訂金">
+          <input type="number" step="0.01" min="0" id="balanceInput" name="balance" placeholder="尾款">
+          <div class="total">總金額：<span id="totalPreview">0</span></div>
+        </div>
+        <div id="paymentOptions" style="display:none">
+          <label><input type="radio" name="payMode" value="single" checked>一次付款</label>
+          <label><input type="radio" name="payMode" value="deposit">只有訂金</label>
+          <label><input type="radio" name="payMode" value="installment">分期</label>
+        </div>
       </div>
-    
+
       <div class="form-group">
         <label>付款來源</label>
         <select th:field="*{paymentSource}">
@@ -47,10 +64,30 @@
         </select>
       </div>
 
+      <div class="form-group">
+        <label>類型</label>
+        <select th:field="*{purchaseType}">
+          <option value="official">公式</option>
+          <option value="secondhand">中古</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>到貨狀態</label>
+        <select th:field="*{received}">
+          <option value="false">未到貨</option>
+          <option value="true">已到貨</option>
+        </select>
+      </div>
+
       <button type="submit">儲存</button>
     </form>
 
-    <a href="/purchases/view">返回列表</a>
+    <div class="form-footer">
+      <a href="/purchases/view">返回列表</a>
+      <a href="/purchases/batch">批次新增</a>
+    </div>
   </div>
+  <script th:src="@{/js/newPurchase.js}" defer></script>
 </body>
 </html>
