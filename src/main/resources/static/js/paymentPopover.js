@@ -14,40 +14,42 @@ const typeMap = {
     secondhand: "中古"
 };
 
-document.querySelectorAll(".amount").forEach(cell => {
-    cell.addEventListener("click", async () => {
-        document.querySelectorAll(".payment-popover").forEach(p => p.remove());
-        const existing = cell.querySelector(".payment-popover");
+async function initDepositLabel(cell, id) {
+    const res = await fetch(`/payment/purchase/${id}`);
+    const payments = await res.json();
 
-        if (existing) {
-            existing.remove();
-            return;
-        }
+    if (payments.length === 1 && payments[0].paymentType === "deposit") {
+        const price = cell.dataset.price;
+        cell.textContent = price + "(訂金)";
+    }
+}
 
-        const id = cell.dataset.id;
+function paymentRow(p){
+    const type = paymentTypeMap[p.paymentType];
+    if(p.note){
+        return `<div>${type}：${p.paidAmount} (${p.note})</div>`;
+    }
+    return `<div>${type}：${p.paidAmount}</div>`;
+}
 
-        const res = await fetch(`/payment/purchase/${id}`);
-        const payments = await res.json();
-        if (payments.length === 1 && payments[0].paymentType === "deposit") {
-            const amountText = cell.textContent;
-            if (!amountText.includes("(訂金)")) {
-                cell.textContent = amountText + "(訂金)";
-            }
-        }
-        
+async function showPopover(cell, id) {
+
+    const res = await fetch(`/payment/purchase/${id}`);
+    const payments = await res.json();
+
+    document.querySelectorAll(".payment-popover").forEach(p => p.remove());        
         let html = "";
 
-        payments.forEach(p => {
-            const type = paymentTypeMap[p.paymentType];
+        if (payments.length === 0) {
 
-            if (p.note) {
-                html += `<div>${type}：${p.paidAmount} (${p.note})</div>`;
-            } else {
-                html += `<div>${type}：${p.paidAmount}</div>`;
-            }
-        });
+            const source = cell.dataset.source;
+            const type = cell.dataset.type;
+        
+            html += `<div>付款來源：${sourceMap[source]}</div>`;
+            html += `<div>類型：${typeMap[type]}</div>`;
+        } else {
+            payments.forEach(p => html += paymentRow(p));
 
-        if (payments.length > 0) {
             const purchase = payments[0].purchase;
 
             html += `<hr>`;
@@ -60,6 +62,15 @@ document.querySelectorAll(".amount").forEach(cell => {
         box.innerHTML = html;
 
         cell.appendChild(box);  
+}
+
+document.querySelectorAll(".amount").forEach(cell => {
+
+    const id = cell.dataset.id;
+    initDepositLabel(cell, id);
+
+    cell.addEventListener("click", () => {
+        showPopover(cell, id);
     });
 });
 

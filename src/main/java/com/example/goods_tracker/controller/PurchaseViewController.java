@@ -6,10 +6,7 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import com.example.goods_tracker.entity.Payment;
 import com.example.goods_tracker.entity.Purchase;
@@ -85,51 +82,62 @@ public class PurchaseViewController {
         });
         purchase.setWork(work);
 
-        if ("single".equals(payMode) && purchase.getTotalPrice() == null) {
-            model.addAttribute("error", "請輸入金額");
-            prepareForm(model, purchase);
-            return "purchases/new";
-        }    
-        else if ("deposit".equals(payMode) && deposit == null) {
-            model.addAttribute("error", "請輸入訂金");
-            prepareForm(model, purchase);
-            return "purchases/new";
-        }  
-        else if ("installment".equals(payMode) && (deposit == null || balance == null)) {
-            model.addAttribute("error", "請輸入訂金和尾款");
-            prepareForm(model, purchase);
-            return "purchases/new";
+        BigDecimal total;
+
+        if ("single".equals(payMode)) {        
+            if (purchase.getTotalPrice() == null) {
+                model.addAttribute("error", "請輸入金額");
+                prepareForm(model, purchase);
+                return "purchases/new";
+            }        
+            total = purchase.getTotalPrice();
         }
+        
+        else if ("deposit".equals(payMode)) {        
+            if (deposit == null) {
+                model.addAttribute("error", "請輸入訂金");
+                prepareForm(model, purchase);
+                return "purchases/new";
+            }        
+            total = deposit;
+        }
+    
+        else { // installment        
+            if (deposit == null || balance == null) {
+                model.addAttribute("error", "請輸入訂金和尾款");
+                prepareForm(model, purchase);
+                return "purchases/new";
+            }
+            total = deposit.add(balance);
+        }
+        
+        purchase.setTotalPrice(total);
 
         purchaseRepository.save(purchase);
 
-        if ("deposit".equals(payMode)) {
-            purchase.setTotalPrice(deposit);
-            
+        if (!"single".equals(payMode)) {
             Payment p = new Payment();
             p.setPurchase(purchase);
             p.setPaymentType("deposit");
             p.setPaidAmount(deposit);
-
-            paymentRepository.save(p);
+            paymentRepository.save(p);        
         }
-        if ("installment".equals(payMode)) {
-            purchase.setTotalPrice(deposit.add(balance));
-
-            Payment p1 = new Payment();
-            p1.setPurchase(purchase);
-            p1.setPaymentType("deposit");
-            p1.setPaidAmount(deposit);
-
-            Payment p2 = new Payment();
-            p2.setPurchase(purchase);
-            p2.setPaymentType("balance");
-            p2.setPaidAmount(balance);
-
-            paymentRepository.save(p1);
-            paymentRepository.save(p2);
+        
+        if ("installment".equals(payMode)) {        
+            Payment p = new Payment();
+            p.setPurchase(purchase);
+            p.setPaymentType("balance");
+            p.setPaidAmount(balance);
+            paymentRepository.save(p);
         }
         
         return "redirect:/purchases/view";
     }
+
+    // @PostMapping("/order/{id}/fee")
+    // public Order setFee(@PathVariable Integer id, @RequestBody Order body) {
+    //     Order o = orderRepo.findById(id).orElseThrow();
+    //     o.setShippingFee(body.getShippingFee());
+    //     return orderRepo.save(o);
+    // }
 }

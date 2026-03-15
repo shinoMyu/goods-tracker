@@ -4,6 +4,7 @@ const installmentBox = document.getElementById("installmentBox");
 
 const depositInput = document.getElementById("depositInput");
 const balanceInput = document.getElementById("balanceInput");
+const totalRow = document.getElementById("totalRow");
 const totalPreview = document.getElementById("totalPreview");
 
 // 點擊金額顯示付款方式
@@ -16,15 +17,37 @@ document.querySelectorAll("input[name='payMode']").forEach(radio => {
     radio.addEventListener("change", () => {
         const mode = radio.value;
 
-        if (mode === "installment") {
-            amountInput.style.display = "none";
-            installmentBox.style.display = "flex";
-            paymentOptions.classList.add("installment-mode");
-        } else {
+        amountInput.style.display = "none";
+        installmentBox.style.display = "none";
+        balanceInput.style.display = "none";
+        totalRow.style.display = "none";
+
+        if (mode === "single") {
             amountInput.style.display = "block";
-            installmentBox.style.display = "none";
-            paymentOptions.classList.remove("installment-mode");
+            options.classList.remove("installment-mode");
         }
+
+        if (mode === "deposit") {
+            installmentBox.style.display = "flex";
+            options.classList.remove("installment-mode");
+        }
+
+        if (mode === "installment") {
+            installmentBox.style.display = "flex";
+            balanceInput.style.display = "block";
+            totalRow.style.display = "flex";
+            options.classList.add("installment-mode");
+        }
+
+        // if (mode === "installment") {
+        //     amountInput.style.display = "none";
+        //     installmentBox.style.display = "flex";
+        //     options.classList.add("installment-mode");
+        // } else {
+        //     amountInput.style.display = "block";
+        //     installmentBox.style.display = "none";
+        //     options.classList.remove("installment-mode");
+        // }
     });
 });
 

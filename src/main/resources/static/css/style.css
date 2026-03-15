@@ -140,13 +140,38 @@ table tbody tr:hover {
     border-radius: 3px;
 }
 
+.tooltip:hover::after {
+    position: absolute;
+    top: -20px;
+    left: 0;
+    z-index: 10;
+    background: #333;
+    color: white;
+    padding: 2px 6px;
+    font-size: 0.75rem;
+    border-radius: 3px;
+    white-space: nowrap;
+}
+
+.work-color:hover::after {
+    content: attr(data-work);
+    top: -20px;
+}
+
 .date-col {
-    width: 70px;
+    width: 60px;
     text-align: left;
+    position: relative;
+}
+
+.date-col:empty:hover::after {
+    content: attr(data-date);
+    top: 6px;
 }
 
 .amount {
     cursor: pointer;
+    width: 95px;
 }
 
 .payment-popover {

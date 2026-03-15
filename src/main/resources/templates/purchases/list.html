@@ -5,8 +5,8 @@
   <link rel="stylesheet" th:href="@{/css/style.css}">
   <title>Purchase List</title>
 </head>
-<body>
 
+<body>
   <div class="header">
     <h1>グッズ購買紀錄</h1>
     <a href="/purchases/new" class="btn-add">新增購買</a>
@@ -20,24 +20,37 @@
         <th>日期</th>
         <th>名稱</th>
         <th>金額</th>
+        <th>郵費</th>
+        <th></th>
         <th>狀態</th>
         <th class="category-col">種類</th>
       </tr>
     </thead>
 
     <tbody>
-      <tr th:each="p : ${purchases}">
+      <tr th:each="p, pStat : ${purchases}">
         <td class="id-col" th:text="${p.id}"></td>
-        <td class="work-color" th:data-work-id="${p.work.id}" th:data-color="${p.work.color}"
-          th:data-received="${p.received}" th:title="${p.work.title}"></td>
-        <td class="date-col" th:text="${#temporals.format(p.purchaseDate, 'yyyy-MM')}"></td>
-        <td th:text="${p.itemName}"></td>
-        <td class="amount" th:attr="data-id=${p.id}" th:text="${p.totalPrice}"></td>
-        <!-- <td th:text="${p.received ? '✓' : ''}"></td> -->
-        <td>
-          <span class="ship-mark" th:attr="data-order=${p.orderId}" th:text="${p.received} ? '✓' : ''">
-          </span>
+        <td class="work-color tooltip" th:data-work-id="${p.work.id}" th:data-color="${p.work.color}"
+          th:data-received="${p.received}" th:data-work="${p.work.title}"></td>
+        <td class="date-col tooltip" th:text="${pStat.index == 0 or purchases[pStat.index-1].purchaseDate != p.purchaseDate 
+                      ? #temporals.format(p.purchaseDate,'yyyy-MM') 
+                      : ''}" th:attr="data-date=${#temporals.format(p.purchaseDate,'yyyy-MM')}">
         </td>
+        <td th:text="${p.itemName}"></td>
+        <td class="amount" th:attr="data-id=${p.id},data-price=${p.totalPrice.stripTrailingZeros().toPlainString()},
+          data-source=${p.paymentSource},data-type=${p.purchaseType}"
+          th:text="${p.totalPrice.stripTrailingZeros().toPlainString()}"></td>
+        <!-- <td th:if="${pStat.index == purchases.size()-1 
+                  or purchases[pStat.index+1].order.id != p.order.id}"
+          th:text="${p.order.domesticShipping}"></td>
+          <td th:unless="${pStat.index == purchases.size()-1 
+                  or purchases[pStat.index+1].order.id != p.order.id}">
+          </td> -->
+        <td></td>
+        <td></td>
+        <td class="ship-mark" th:attr="data-order=${p.orderId}" th:text="${p.received} ? '✓' : ''">
+          </tdclass>>
+          <!-- <a th:href="@{/orders/{id}/edit(id=${p.order.id})}">edit</a> -->
         <td class="category-col" th:text="${p.category}"></td>
       </tr>
 
