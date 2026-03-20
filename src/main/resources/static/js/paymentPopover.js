@@ -49,7 +49,6 @@ async function showPopover(cell, id) {
             html += `<div>類型：${typeMap[type]}</div>`;
         } else {
             payments.forEach(p => html += paymentRow(p));
-
             const purchase = payments[0].purchase;
 
             html += `<hr>`;
@@ -65,7 +64,6 @@ async function showPopover(cell, id) {
 }
 
 document.querySelectorAll(".amount").forEach(cell => {
-
     const id = cell.dataset.id;
     initDepositLabel(cell, id);
 

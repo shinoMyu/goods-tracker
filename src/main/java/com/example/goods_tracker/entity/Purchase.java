@@ -12,7 +12,6 @@ public class Purchase {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    private Integer orderId;
     private LocalDate purchaseDate;
     private String itemName;
     private String category;
@@ -25,4 +24,8 @@ public class Purchase {
     @ManyToOne
     @JoinColumn(name = "work_id")
     private Work work;
+
+    @ManyToOne
+    @JoinColumn(name = "order_id")
+    private Order order;
 }

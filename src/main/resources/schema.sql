@@ -1,12 +1,13 @@
 CREATE TABLE IF NOT EXISTS orders (
 	id INT AUTO_INCREMENT PRIMARY KEY,
-    shipping_fee DECIMAL(10,2) DEFAULT 0
+    shipping_fee DECIMAL(10,2),
+    color VARCHAR(20)
 );
 
 CREATE TABLE IF NOT EXISTS work (
     id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(255) UNIQUE,
-    color VARCHAR(20)
+    color VARCHAR(20) UNIQUE
 );
 
 CREATE TABLE IF NOT EXISTS purchase (
@@ -30,7 +31,7 @@ CREATE TABLE IF NOT EXISTS payment (
     id INT AUTO_INCREMENT PRIMARY KEY,
     purchase_id INT NOT NULL,
     paid_amount DECIMAL(10,2) NOT NULL,
-    payment_type ENUM('deposit','balance'),
+    payment_type ENUM('deposit','balance','extra'),
     note VARCHAR(255),
 
     FOREIGN KEY (purchase_id) REFERENCES purchase(id)

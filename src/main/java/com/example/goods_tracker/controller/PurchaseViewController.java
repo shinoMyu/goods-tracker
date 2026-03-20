@@ -8,9 +8,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import com.example.goods_tracker.entity.Order;
 import com.example.goods_tracker.entity.Payment;
 import com.example.goods_tracker.entity.Purchase;
 import com.example.goods_tracker.entity.Work;
+import com.example.goods_tracker.repository.OrderRepository;
 import com.example.goods_tracker.repository.PaymentRepository;
 import com.example.goods_tracker.repository.PurchaseRepository;
 import com.example.goods_tracker.repository.WorkRepository;
@@ -22,14 +24,17 @@ public class PurchaseViewController {
     private final PurchaseRepository purchaseRepository;
     private final WorkRepository workRepository;
     private final PaymentRepository paymentRepository;
+    private final OrderRepository orderRepository;
 
     public PurchaseViewController(
             PurchaseRepository purchaseRepository,
             WorkRepository workRepository,
-            PaymentRepository paymentRepository) {
+            PaymentRepository paymentRepository,
+            OrderRepository orderRepository) {
         this.purchaseRepository = purchaseRepository;
         this.workRepository = workRepository;
         this.paymentRepository = paymentRepository;
+        this.orderRepository = orderRepository;
     }
 
     @GetMapping("/view")
@@ -82,6 +87,10 @@ public class PurchaseViewController {
         });
         purchase.setWork(work);
 
+        Order order = new Order();
+        orderRepository.save(order);
+        purchase.setOrder(order);
+
         BigDecimal total;
 
         if ("single".equals(payMode)) {        
@@ -132,6 +141,15 @@ public class PurchaseViewController {
         }
         
         return "redirect:/purchases/view";
+    }
+
+    @PostMapping("/{id}/received")
+    public void updateReceived(@PathVariable Integer id,
+                            @RequestBody Boolean received) {
+
+        Purchase p = purchaseRepository.findById(id).orElseThrow();
+        p.setReceived(received);
+        purchaseRepository.save(p);
     }
 
     // @PostMapping("/order/{id}/fee")

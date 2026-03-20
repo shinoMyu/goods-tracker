@@ -20,15 +20,17 @@
         <th>日期</th>
         <th>名稱</th>
         <th>金額</th>
-        <th>郵費</th>
         <th></th>
+        <th>郵費</th>
         <th>狀態</th>
         <th class="category-col">種類</th>
       </tr>
     </thead>
 
     <tbody>
-      <tr th:each="p, pStat : ${purchases}">
+      <tr th:each="p, pStat : ${purchases}" 
+          th:attr="data-id=${p.id},data-price=${p.totalPrice}">
+            <!-- data-shipping=${p.order?.shippingFee},data-extra=${p.extra}"> -->
         <td class="id-col" th:text="${p.id}"></td>
         <td class="work-color tooltip" th:data-work-id="${p.work.id}" th:data-color="${p.work.color}"
           th:data-received="${p.received}" th:data-work="${p.work.title}"></td>
@@ -40,28 +42,38 @@
         <td class="amount" th:attr="data-id=${p.id},data-price=${p.totalPrice.stripTrailingZeros().toPlainString()},
           data-source=${p.paymentSource},data-type=${p.purchaseType}"
           th:text="${p.totalPrice.stripTrailingZeros().toPlainString()}"></td>
-        <!-- <td th:if="${pStat.index == purchases.size()-1 
-                  or purchases[pStat.index+1].order.id != p.order.id}"
-          th:text="${p.order.domesticShipping}"></td>
-          <td th:unless="${pStat.index == purchases.size()-1 
-                  or purchases[pStat.index+1].order.id != p.order.id}">
-          </td> -->
         <td></td>
-        <td></td>
-        <td class="ship-mark" th:attr="data-order=${p.orderId}" th:text="${p.received} ? '✓' : ''">
-          </tdclass>>
-          <!-- <a th:href="@{/orders/{id}/edit(id=${p.order.id})}">edit</a> -->
+        <td class="shipping" 
+            th:attr="data-order=${p.order?.id}"><span th:text="${p.order?.shippingFee != null 
+              ? p.order.shippingFee.stripTrailingZeros().toPlainString() : ''}"></span></td>
+        <td class="status tooltip"
+            th:attr="data-order=${p.order?.id}, data-received=${p.received},
+              data-shipping=${p.order?.shippingFee}"
+              ><span class="shippingMark" th:if="${p.received}">✓</span></td>
         <td class="category-col" th:text="${p.category}"></td>
       </tr>
 
-      <tr th:if="${#lists.isEmpty(purchases)}">
-        <td colspan="8">No purchases yet</td>
-      </tr>
+    <tr th:if="${#lists.isEmpty(purchases)}">
+      <td colspan="9" class="empty-state">
+        <div class="empty-text">尚無購買紀錄</div>
+        <div class="empty-tip">請點擊「新增購買」</div>
+      </td>
+    </tr>
     </tbody>
+
+    <tfoot>
+      <tr th:if="${not #lists.isEmpty(purchases)}">
+        <td colspan="7"></td>
+        <td id="total-amount">總計：</td>
+        <td></td>
+      </tr>
+    </tfoot>
   </table>
 
   <script th:src="@{/js/workColor.js}" defer></script>
-  <!-- <script th:src="@{/js/shippingMark.js}" defer></script> -->
   <script th:src="@{/js/paymentPopover.js}" defer></script>
+  <!-- <script th:src="@{/js/shippingMark.js}" defer></script> -->
+  <script th:src="@{/js/shippingEdit.js}" defer></script>
+  <script th:src="@{/js/status.js}" defer></script>
 </body>
 </html>

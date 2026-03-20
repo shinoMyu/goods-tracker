@@ -1,10 +1,14 @@
-document.querySelectorAll(".work-color").forEach(cell => {
+function applyWorkColor(cell) {
   const color = cell.dataset.color;
   const received = cell.dataset.received === "true";
-  // 初始化顏色
+
   if (color && received) {
     cell.style.background = color;
   }
+}
+
+document.querySelectorAll(".work-color").forEach(cell => {
+  applyWorkColor(cell);
 
   cell.addEventListener("click", () => {
     // 已經有顏色 => 不允許修改
@@ -23,7 +27,6 @@ document.querySelectorAll(".work-color").forEach(cell => {
     input.click();
   });
 });
-
 
 document.querySelectorAll(".work-color").forEach(cell => {
   cell.addEventListener("mouseenter", () => {

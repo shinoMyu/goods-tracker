@@ -155,7 +155,6 @@ table tbody tr:hover {
 
 .work-color:hover::after {
     content: attr(data-work);
-    top: -20px;
 }
 
 .date-col {
@@ -184,16 +183,74 @@ table tbody tr:hover {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.ship-mark {
+.shipping {
+    width: 90px;
+}
+
+.status {
+    padding: 0;
     color: #333;
     font-weight: bold;
     font-size: 0.9rem;
+    position: relative;
+    cursor: pointer;
+    width: 30px;
+    text-align: center;
+}
+
+.status[data-tip]:hover::after {
+    content: attr(data-tip);
+    font-weight: normal;
+}
+
+.status:has(.shippingMark) {
+    cursor: default;
+}
+
+.editable {
+  cursor: pointer;
+}
+.editable:hover {
+  background-color: #dfd2d250;
 }
 
 .category-col {
     font-size: 0.8rem;
     color: #686a6d;
     width: 120px;
+}
+
+tfoot td {
+    border-top: 2px solid #58535387;
+    font-weight: bold;
+    background-color: #fafafa;
+    padding-top: 7px;
+    padding-bottom: 7px;
+    white-space: nowrap;
+    /* position: sticky;
+    bottom: 0; */
+  }
+  
+#total-amount {
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.empty-state {
+  padding: 40px;
+  text-align: center;
+  color: #666;
+  font-size: 1rem;
+}
+
+.empty-text {
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.empty-tip {
+  font-size: 0.9rem;
+  color: #999;
 }
 
 .container {
