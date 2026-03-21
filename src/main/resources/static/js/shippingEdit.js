@@ -2,7 +2,6 @@ document.querySelectorAll(".shipping").forEach(cell => {
   let original = "";
 
   cell.addEventListener("dblclick", () => {
-    if (cell.textContent.trim()) return;
     if (!cell.classList.contains("editable")) return;
 
     original = cell.textContent.trim();
@@ -14,19 +13,17 @@ document.querySelectorAll(".shipping").forEach(cell => {
   cell.addEventListener("keydown", (e) => {
     if (e.key === "Enter") {
       e.preventDefault();
-      cell.blur(); 
+      cell.blur();
     }
   });
 
   cell.addEventListener("blur", async () => {
     if (!cell.isContentEditable) return;
-
     cell.contentEditable = false;
 
     const orderId = cell.dataset.order;
     const value = cell.textContent.trim();
 
-    // 沒改就不送
     if (value === original) return;
 
     const fee = parseFloat(value);
@@ -44,13 +41,10 @@ document.querySelectorAll(".shipping").forEach(cell => {
       body: JSON.stringify(fee)
     });
 
-    cell.classList.remove("editable");
-
     const row = cell.closest("tr");
     const status = row.querySelector(".status");
 
     status.dataset.shipping = fee;
-    status.removeAttribute("data-tip");
+    updateRowUI(row);
   });
 });
-

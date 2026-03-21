@@ -1,12 +1,3 @@
-function applyWorkColor(cell) {
-  const color = cell.dataset.color;
-  const received = cell.dataset.received === "true";
-
-  if (color && received) {
-    cell.style.background = color;
-  }
-}
-
 document.querySelectorAll(".work-color").forEach(cell => {
   applyWorkColor(cell);
 
@@ -27,6 +18,18 @@ document.querySelectorAll(".work-color").forEach(cell => {
     input.click();
   });
 });
+
+
+// const usedWorkColors = new Set();
+
+// document.querySelectorAll(".work-color").forEach(cell => {
+//   if (cell.dataset.color) {
+//     usedWorkColors.add(cell.dataset.color);
+//   }
+// });
+
+// setupColorPicker(".work-color", usedWorkColors);
+
 
 document.querySelectorAll(".work-color").forEach(cell => {
   cell.addEventListener("mouseenter", () => {
