@@ -9,9 +9,23 @@
 <body>
   <div class="header">
     <h1>グッズ購買紀錄</h1>
-    <a href="/purchases/new" class="btn-add">新增購買</a>
+    <div class="actions">
+      <a href="/purchases/new" class="btn-add">新增購買</a>
+      <div id="menu" class="menu">
+        <button id="moreBtn" class="btn-more">⋯</button>
+        <div class="dropdown hidden">
+          <button id="mergeModeBtn">合併出貨</button>
+        </div>
+      </div>
+    </div>
   </div>
-
+  <div id="mergeBar" class="merge-bar hidden">
+    <span id="mergeCount">已選 0 筆</span>
+    <button id="clearMergeBtn">重設</button>
+    <button id="confirmMergeBtn">確認合併</button>
+    <button id="exitMergeBtn">取消</button>
+  </div>
+  
   <table>
     <thead>
       <tr>
@@ -44,11 +58,13 @@
           th:text="${p.totalPrice.stripTrailingZeros().toPlainString()}"></td>
         <td></td>
         <td class="shipping" 
-            th:attr="data-order=${p.order?.id}"><span th:text="${p.order?.shippingFee != null 
+            th:attr="data-order=${p.order?.id},
+                    data-order-count=${p.order != null ? orderCountMap[p.order.id] : 0}
+            "><span th:text="${p.order?.shippingFee != null 
               ? p.order.shippingFee.stripTrailingZeros().toPlainString() : ''}"></span></td>
         <td class="status tooltip"
             th:attr="data-order=${p.order?.id}, data-received=${p.received},
-              data-shipping=${p.order?.shippingFee}"
+              data-shipping=${p.order?.shippingFee}, data-color=${p.order?.color}"
               ><span class="shippingMark" th:if="${p.received}">✓</span></td>
         <td class="category-col" th:text="${p.category}"></td>
       </tr>
@@ -70,9 +86,12 @@
     </tfoot>
   </table>
 
+  <script th:src="@{/js/menu.js}" defer></script>
+  <script th:src="@{/js/mergeMode.js}" defer></script>
   <script th:src="@{/js/ui-utils.js}" defer></script>
   <script th:src="@{/js/workColor.js}" defer></script>
   <script th:src="@{/js/paymentPopover.js}" defer></script>
+  <!-- <script th:src="@{/js/shippingMark.js}" defer></script> -->
   <script th:src="@{/js/shippingEdit.js}" defer></script>
   <script th:src="@{/js/status.js}" defer></script>
 </body>

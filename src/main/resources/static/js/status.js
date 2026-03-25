@@ -13,7 +13,7 @@ document.querySelectorAll(".status").forEach(cell => {
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify(true)
+                body: JSON.stringify({received: true})
             });
 
             // 更新 UI（不用 reload）

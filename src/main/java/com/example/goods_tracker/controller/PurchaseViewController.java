@@ -3,6 +3,9 @@ package com.example.goods_tracker.controller;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -39,7 +42,18 @@ public class PurchaseViewController {
 
     @GetMapping("/view")
     public String viewPurchases(Model model) {
+        List<Purchase> purchases = purchaseRepository.findAllByOrderByIdAsc();
+
+        Map<Integer, Long> orderCountMap = purchases.stream()
+            .filter(p -> p.getOrder() != null)
+            .collect(Collectors.groupingBy(
+                p -> p.getOrder().getId(),
+                Collectors.counting()
+            ));
+        
         model.addAttribute("purchases", purchaseRepository.findAllByOrderByIdAsc());
+        model.addAttribute("orderCountMap", orderCountMap);
+        
         return "purchases/list";
     }
 
@@ -144,18 +158,13 @@ public class PurchaseViewController {
     }
 
     @PostMapping("/{id}/received")
+    @ResponseBody
     public void updateReceived(@PathVariable Integer id,
-                            @RequestBody Boolean received) {
+                               @RequestBody Map<String, Boolean> body) {
 
+        Boolean received = body.get("received");
         Purchase p = purchaseRepository.findById(id).orElseThrow();
         p.setReceived(received);
         purchaseRepository.save(p);
     }
-
-    // @PostMapping("/order/{id}/fee")
-    // public Order setFee(@PathVariable Integer id, @RequestBody Order body) {
-    //     Order o = orderRepo.findById(id).orElseThrow();
-    //     o.setShippingFee(body.getShippingFee());
-    //     return orderRepo.save(o);
-    // }
 }

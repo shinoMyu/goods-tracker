@@ -39,7 +39,7 @@ public class OrderController {
     }
     // 分組 purchase
     @PostMapping("/group")
-    public void groupPurchases(@RequestBody List<Integer> purchaseIds) {
+    public Order groupPurchases(@RequestBody List<Integer> purchaseIds) {
 
         Order order = new Order();
         orderRepository.save(order);
@@ -49,6 +49,7 @@ public class OrderController {
             p.setOrder(order);
             purchaseRepository.save(p);
         }
+        return order; 
     }
 
     @PostMapping("/{id}/color")

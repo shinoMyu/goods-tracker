@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.example.goods_tracker.entity.Purchase;
@@ -24,4 +25,7 @@ public interface PurchaseRepository extends JpaRepository<Purchase, Integer> {
     Optional<LocalDate> findEarliestPurchaseDate();
 
     Purchase findTopByOrderByIdDesc();
+
+    @Query("SELECT COUNT(p) FROM Purchase p WHERE p.order.id = :orderId")
+    long countByOrderId(@Param("orderId") Integer orderId);
 }
