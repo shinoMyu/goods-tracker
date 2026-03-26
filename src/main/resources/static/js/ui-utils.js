@@ -1,5 +1,32 @@
-function applyColor(element, color, enabled = true) {
-  element.style.background = (color && enabled) ? color : "";
+function openColorPicker(onChange) {
+  const input = document.createElement("input");
+  input.type = "color";
+
+  input.addEventListener("input", () => {
+    onChange(input.value);
+  });
+
+  input.click();
+}
+
+function attachConfirmPopover(element, options) {
+  const { className, onConfirm } = options;
+  const existing = element.querySelector(".color-popover");
+  if (existing) return;
+
+  const box = document.createElement("div");
+  box.className = `color-popover ${className}`;
+  box.innerHTML = `<button class="color-confirm">確認</button>`;
+
+  element.appendChild(box);
+
+  box.querySelector("button").addEventListener("click", (e) => {
+    e.stopPropagation();
+
+    onConfirm();  
+
+    box.remove();
+  });
 }
 
 function updateRowUI(row) {
@@ -35,41 +62,9 @@ function updateRowUI(row) {
   }
   status.classList.remove("merge-pending");
 
-  // if (!hasShipping || !hasColor) {
-  //   status.style.cursor = "default"; 
-  // }
-}
-
-function applyOrderColorToGroup(orderId, color, confirmed = false) {
-  document.querySelectorAll(`.status[data-order="${orderId}"]`)
-    .forEach(cell => {
-      applyColor(cell, color, true);
-
-      if (confirmed) {
-        cell.dataset.color = color;
-      }
-    });
-}
-
-function applyColorToElements(selector, color) {
-  document.querySelectorAll(selector).forEach(el => {
-    el.style.background = color;
-    el.style.color = color;
-  });
-}
-
-
-function openColorPicker(onChange, onConfirm) {
-  const input = document.createElement("input");
-  input.type = "color";
-
-  input.addEventListener("input", () => {
-    onChange(input.value);
-  });
-
-  input.addEventListener("change", () => {
-    onConfirm(input.value);
-  });
-
-  input.click();
+  if (hasShipping) {
+    status.style.cursor = "default"; 
+  } else {
+    status.style.cursor = "pointer"; 
+  }
 }
