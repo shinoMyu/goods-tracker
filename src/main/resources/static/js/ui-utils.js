@@ -67,6 +67,14 @@ document.addEventListener("click", (e) => {
   }
 });
 
+function setEditable(shipping, enabled) {
+  if (enabled) {
+    shipping.classList.add("editable");
+  } else {
+    shipping.classList.remove("editable");
+  }
+}
+
 function updateRowUI(row) {
   const status = row.querySelector(".status");
   const shipping = row.querySelector(".shipping");
@@ -76,21 +84,56 @@ function updateRowUI(row) {
 
   const orderCount = parseInt(shipping.dataset.orderCount || "0");
   const hasColor = status.dataset.color;
+  
+  const orderId = status.dataset.order;
+  let isLast = false;
+
+  if (orderId) {
+    const all = Array.from(
+      document.querySelectorAll(`.status[data-order='${orderId}']`)
+    );
+
+    const last = all[all.length - 1];
+    isLast = last === status;
+
+    all.forEach(cell => {
+      const row = cell.closest("tr");
+      const shippingCell = row.querySelector(".shipping");
+  
+      if (cell !== last) {
+        shippingCell.textContent = "";
+      }
+    });
+  }
 
   // tooltip
   if (!received) {
     status.dataset.tip = "雙擊設為已到貨";
   } else if (!hasShipping) {
-    status.dataset.tip = "可編輯郵費";
+    if (orderCount > 1) {
+      if (isLast) {
+        status.dataset.tip = "可編輯郵費";
+      } else {
+        status.removeAttribute("data-tip");
+      }
+    } else {
+      status.dataset.tip = "可編輯郵費";
+    }
   } else {
     status.removeAttribute("data-tip");
-  }
+  }  
 
   // editable
   if (received && !hasShipping) {
-    shipping.classList.add("editable");
+    if (orderCount > 1) {
+      // merge 
+      setEditable(shipping, hasColor && isLast);
+    } else {
+      // 單獨出貨
+      setEditable(shipping, true);
+    }
   } else {
-    shipping.classList.remove("editable");
+    setEditable(shipping, false);
   }
 
   if (orderCount > 1 && !hasShipping && !hasColor) {
@@ -105,5 +148,15 @@ function updateRowUI(row) {
     status.style.cursor = "default";
   } else {
     status.style.cursor = "pointer";
+  }
+
+  if (hasColor && orderCount > 1 && !isLast) {
+    status.classList.add("no-hover");
+  } else {
+    status.classList.remove("no-hover");
+  }
+
+  if (status.dataset.color) {
+    shipping.style.color = status.dataset.color;
   }
 }

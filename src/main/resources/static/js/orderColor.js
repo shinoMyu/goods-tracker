@@ -56,16 +56,6 @@ document.querySelectorAll(".status").forEach(cell => {
 
           updateRowUI(c.closest("tr"));
         });
-
     });
   });
 });
-
-function markFeeOwner(orderId) {
-  const cells = document.querySelectorAll(`.shipping[data-order='${orderId}']`);
-
-  cells.forEach(c => delete c.dataset.feeOwner);
-
-  const last = cells[cells.length - 1];
-  if (last) last.dataset.feeOwner = "true";
-}

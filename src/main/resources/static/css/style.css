@@ -247,6 +247,7 @@ input[type="color"] {
 .color-picker:focus {
     outline: none;
 }
+
 .work-color .color-popover {
     top: 100%;
     left: 50%;
@@ -337,6 +338,10 @@ input[type="color"] {
 .status.merge-pending .shippingMark {
     color: #aaa;
     cursor: pointer;
+}
+
+.status.no-hover .shippingMark {
+    cursor: default;
 }
 
 .editable {
