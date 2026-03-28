@@ -26,42 +26,46 @@ document.querySelectorAll(".status").forEach(cell => {
     if (cell.dataset.color) return;
     if (!cell.classList.contains("merge-pending")) return;
 
-    openColorPicker((color) => {
+    showColorPicker(cell, (color) => {
       applyOrderColorToAll(orderId, color);
 
-      document
-        .querySelectorAll(`.status[data-order='${orderId}']`)
+      document.querySelectorAll(`.status[data-order='${orderId}']`)
         .forEach(c => {
           c.dataset.pendingColor = color;
         });
     });
   });
 
-
   cell.addEventListener("mouseenter", () => {
     if (!cell.dataset.pendingColor || cell.dataset.color) return;
 
-    attachConfirmPopover(cell, {
-      className: "color-popover--order",
-      onConfirm: async () => {
+    showConfirm(cell, async () => {
+      const orderId = cell.dataset.order;
+      const color = cell.dataset.pendingColor;
 
-        const orderId = cell.dataset.order;
-        const color = cell.dataset.pendingColor;
+      await fetch(`/orders/${orderId}/color`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ color })
+      });
 
-        await fetch(`/orders/${orderId}/color`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ color })
+      document.querySelectorAll(`.status[data-order='${orderId}']`)
+        .forEach(c => {
+          c.dataset.color = color;
+          delete c.dataset.pendingColor;
+
+          updateRowUI(c.closest("tr"));
         });
 
-        document.querySelectorAll(`.status[data-order='${orderId}']`)
-          .forEach(c => {
-            c.dataset.color = color;
-            delete c.dataset.pendingColor;
-
-            updateRowUI(c.closest("tr"));
-          });
-      }
     });
   });
 });
+
+function markFeeOwner(orderId) {
+  const cells = document.querySelectorAll(`.shipping[data-order='${orderId}']`);
+
+  cells.forEach(c => delete c.dataset.feeOwner);
+
+  const last = cells[cells.length - 1];
+  if (last) last.dataset.feeOwner = "true";
+}

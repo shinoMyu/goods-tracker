@@ -1,33 +1,71 @@
-function openColorPicker(onChange) {
-  const input = document.createElement("input");
-  input.type = "color";
+let currentPopover = null;
 
-  input.addEventListener("input", () => {
-    onChange(input.value);
-  });
-
-  input.click();
+function closePopover() {
+  if (currentPopover && currentPopover.parentNode) {
+    currentPopover.remove();
+  }
+  currentPopover = null;
 }
 
-function attachConfirmPopover(element, options) {
-  const { className, onConfirm } = options;
-  const existing = element.querySelector(".color-popover");
-  if (existing) return;
+function openPopover(element, content, position = "body") {
+  closePopover();
 
   const box = document.createElement("div");
-  box.className = `color-popover ${className}`;
-  box.innerHTML = `<button class="color-confirm">確認</button>`;
+  box.className = "color-popover";
+  box.innerHTML = content;
 
-  element.appendChild(box);
+  if (position === "body") {
+    document.body.appendChild(box);
+  } else {
+    element.appendChild(box);
+  }
 
-  box.querySelector("button").addEventListener("click", (e) => {
-    e.stopPropagation();
+  currentPopover = box;
+  return box;
+}
 
-    onConfirm();  
+function showColorPicker(cell, onPreview) {
+  const rect = cell.getBoundingClientRect();
 
-    box.remove();
+  const box = openPopover(
+    cell,
+    `<input type="color" class="color-picker">`
+  );
+
+  box.style.position = "fixed";
+  box.style.left = rect.right + "px";
+  box.style.top = rect.bottom + "px";
+
+  const picker = box.querySelector("input");
+
+  picker.addEventListener("input", () => {
+    onPreview(picker.value);
   });
 }
+
+function showConfirm(element, onConfirm) {
+  const box = openPopover(
+    element,
+    `<button class="color-confirm">確認</button>`,
+    "self"
+  );
+
+  box.querySelector("button").onclick = (e) => {
+    e.stopPropagation();
+    onConfirm();
+    closePopover(); 
+  };
+}
+
+document.addEventListener("click", (e) => {
+  const isPopover = e.target.closest(".color-popover");
+  const isWork = e.target.closest(".work-color");
+  const isEditableStatus = e.target.closest(".status.merge-pending");
+
+  if (!isPopover && !isWork && !isEditableStatus) {
+    closePopover();
+  }
+});
 
 function updateRowUI(row) {
   const status = row.querySelector(".status");
@@ -59,12 +97,13 @@ function updateRowUI(row) {
     status.classList.add("merge-pending");
     status.dataset.tip = "點擊設定顏色";
     return;
+  } else {
+    status.classList.remove("merge-pending");
   }
-  status.classList.remove("merge-pending");
 
   if (hasShipping) {
-    status.style.cursor = "default"; 
+    status.style.cursor = "default";
   } else {
-    status.style.cursor = "pointer"; 
+    status.style.cursor = "pointer";
   }
 }

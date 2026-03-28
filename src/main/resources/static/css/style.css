@@ -230,11 +230,24 @@ table tbody tr:hover {
     position: absolute;
     background: white;
     border: 1px solid #aaa;
-    padding: 3px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    padding: 4px;
+    border-radius: 6px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
 }
 
-.color-popover--work {
+.color-picker {
+    width: 25px;
+    height: 25px;
+}
+
+input[type="color"] {
+    cursor: pointer;
+}
+ 
+.color-picker:focus {
+    outline: none;
+}
+.work-color .color-popover {
     top: 100%;
     left: 50%;
     transform: translateX(-50%);
@@ -304,13 +317,13 @@ table tbody tr:hover {
     padding: 0;
     color: #333;
     font-weight: bold;
-    font-size: 0.9rem;
+    font-size: 1rem;
     position: relative;
     width: 30px;
     text-align: center;
 }
 
-.color-popover--order {
+.status .color-popover {
     top: 50%;
     left: -45px;
     transform: translateY(-50%);
@@ -323,6 +336,7 @@ table tbody tr:hover {
 
 .status.merge-pending .shippingMark {
     color: #aaa;
+    cursor: pointer;
 }
 
 .editable {
