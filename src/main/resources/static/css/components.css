@@ -1,0 +1,117 @@
+.btn-add, button {
+    border: 1px solid #bcbcbc;
+    border-radius: 8px;
+    background: #e1e6ec;
+    color: #4f5355;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-add {
+    margin: 0;
+    padding: 6px 12px;
+}
+
+.btn-add:hover,
+.btn-more:hover,
+.menu button:hover{
+    background:#f5f5f5;
+    color:#666c74;
+    text-decoration: none;
+}
+
+.btn-more {
+    width: 30px;
+    padding: 5px 0;
+}
+
+.menu {
+    position: relative;
+}
+
+.dropdown {
+    position: absolute;
+    top: 30px;
+    right: 0;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 4px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    z-index: 10;
+}
+  
+.dropdown button{
+    padding: 5px 9px;
+    font-size: 0.8rem;
+}
+
+.work-color {
+    position: relative;
+}
+
+.color-popover {
+    position: absolute;
+    background: white;
+    border: 1px solid #aaa;
+    padding: 4px;
+    border-radius: 6px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+.color-picker {
+    width: 25px;
+    height: 25px;
+}
+
+input[type="color"] {
+    cursor: pointer;
+}
+ 
+.color-picker:focus {
+    outline: none;
+}
+
+.color-confirm {
+    border: none;
+    background: #3e8bb8;
+    color: white;
+    font-size: 0.8rem;
+    font-weight: 300;
+    padding: 2px 6px;
+    cursor: pointer;
+    border-radius: 3px;
+}
+
+.tooltip:hover::after,
+.status[data-tip]::after {
+    position: absolute;
+    top: -20px;
+    left: 0;
+    z-index: 10;
+    background: #333;
+    color: white;
+    padding: 2px 6px;
+    font-size: 0.75rem;
+    border-radius: 3px;
+    white-space: nowrap;
+    pointer-events: none;
+}
+
+.date-col {
+    position: relative;
+}
+
+.payment-popover {
+    position: absolute;
+    background: white;
+    padding: 8px;
+    font-size: 0.8rem;
+    border: 1px solid #a8a7a7;
+    border-radius: 5%;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.status {
+    position: relative;
+}

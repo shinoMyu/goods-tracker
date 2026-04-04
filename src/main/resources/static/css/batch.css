@@ -1,0 +1,119 @@
+.batch {
+    max-width: 700px;
+    padding: 40px 25px;
+}
+
+.section {
+    margin-bottom: 15px;
+    padding: 20px 15px;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    background: #fafafa;
+}
+
+.section h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+    color: #555;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.form-grid .form-group {
+    margin: 0;
+}
+
+.item-row {
+    position: relative;
+    border-top: 1px dashed #ddd;
+    padding-top: 25px;
+}
+  
+.item-index {
+    position: absolute;
+    top: 7px;
+    left: -5px;
+    font-size: 0.95rem;
+    background: #91bbd3;
+    color: white;
+    padding: 5px 11px;
+    border-radius: 6px;
+}  
+
+.item-row .form-group label {
+    width: 35px;
+}
+
+.item-row .form-group input {
+    max-width: 333px;
+}
+
+.item-row .amount-row {
+    margin-left: 124px;
+    margin-bottom: 30px;
+}
+
+.item-row .paymentOptions {
+    width: 90px;
+    margin-left: 35px;
+}
+
+.item-row .paymentOptions label {
+    margin: 5px;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+.item-row .installmentBox {
+    width: 333px;
+    gap: 10px;
+    position: relative;
+}
+
+.item-row .installmentBox input {
+    width: 95px;
+}
+
+.item-row .total {
+    position: absolute;
+    top: 30px;
+    font-size: 0.85rem;
+    z-index: 1;
+}
+
+.section button{
+    border-radius: 6px;
+    color: white;
+    border: none;
+}
+
+.remove-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;  
+    background: #fc7373;
+    width: 45px;
+    padding: 5px;
+    font-size: 0.8rem;
+
+}
+  
+.remove-btn:hover {
+    background: #f95959;
+}
+
+.add-btn {
+    display: block;
+    margin: 30px auto 5px auto;
+    padding: 5px 14px;
+    background: #5591b4;
+}
+  
+ .add-btn:hover {
+    background: #458ab2;
+}

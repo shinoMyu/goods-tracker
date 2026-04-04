@@ -1,0 +1,37 @@
+@font-face {
+    font-family: "MyFont";
+    src: url(../fonts/jf-openhuninn-21.woff2);
+}
+
+body {
+    font-family: "MyFont";
+    background-color: #f7f7f7;
+    color: #333;
+    margin: 0;
+    padding: 30px;
+}
+
+input,
+select,
+button,
+textarea {
+    font-family: "MyFont";
+    box-sizing: border-box;
+}
+
+a {
+    text-decoration: none;
+    color: #6c757d;
+    font-size: 0.95rem;
+    margin-top: 20px;
+    transition: color 0.2s;
+}
+
+a:hover {
+    color: #2a739d;
+    text-decoration: underline;
+}
+
+.hidden {
+    display: none;
+}

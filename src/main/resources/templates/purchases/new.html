@@ -1,8 +1,12 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
   <meta charset="UTF-8">
-  <link rel="stylesheet" th:href="@{/css/style.css}">
+  <link rel="stylesheet" th:href="@{/css/base.css}">
+  <link rel="stylesheet" th:href="@{/css/layout.css}">
+  <link rel="stylesheet" th:href="@{/css/components.css}">
+  <link rel="stylesheet" th:href="@{/css/form.css}">
   <title>New Purchase</title>
 </head>
 
@@ -10,8 +14,12 @@
   <div class="container">
     <h1>新增購買紀錄</h1>
 
-    <p class="form-error" th:if="${error}" th:text="${error}"></p>
     <form th:action="@{/purchases}" th:object="${purchase}" method="post">
+      <div class="form-error" th:if="${error} or${#fields.hasErrors()} or ${workError} or ${paymentError}">
+        <p th:each="err : ${#fields.errors()}" th:text="${err}"></p>
+        <p th:if="${workError}" th:text="${workError}"></p>  
+        <p th:if="${paymentError}" th:text="${paymentError}"></p>
+      </div>
 
       <div class="form-group">
         <label>日期</label>
@@ -21,12 +29,12 @@
 
       <div class="form-group">
         <label>名稱</label>
-        <input type="text" th:field="*{itemName}" required>
+        <input type="text"th:field="*{itemName}" required>
       </div>
 
       <div class="form-group">
         <label>作品</label>
-        <input list="works" name="workTitle" placeholder="輸入或選擇作品" required>
+        <input list="works" name="workTitle" th:value="${workTitle}" placeholder="輸入或選擇作品" required>
         <datalist id="works">
           <option th:each="w : ${works}" th:value="${w.title}"></option>
         </datalist>
@@ -34,7 +42,7 @@
 
       <div class="form-group">
         <label>種類</label>
-        <input list="categories" th:field="*{category}" placeholder="輸入或選擇種類" required>
+        <input list="categories"th:field="*{category}" placeholder="輸入或選擇種類" required>
         <datalist id="categories">
           <option th:each="c : ${categories}" th:value="${c}"></option>
         </datalist>
@@ -42,7 +50,7 @@
 
       <div class="form-group">
         <label>金額</label>
-        <input type="number" step="0.01" min="0" id="amountInput" th:field="*{totalPrice}">
+        <input type="number" step="0.01" min="0" id="amountInput"th:field="*{totalPrice}">
         <div id="installmentBox" style="display:none">
           <input type="number" step="0.01" min="0" id="depositInput" name="deposit" placeholder="訂金">
           <input type="number" step="0.01" min="0" id="balanceInput" name="balance" placeholder="尾款">
@@ -88,6 +96,8 @@
       <a href="/purchases/batch">批次新增</a>
     </div>
   </div>
+  <script th:src="@{/js/paymentRow.js}" defer></script>
   <script th:src="@{/js/newPurchase.js}" defer></script>
 </body>
+
 </html>

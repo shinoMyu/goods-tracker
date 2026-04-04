@@ -1,0 +1,225 @@
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+    font-size: 0.9rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: #e1e6ec;
+    box-shadow: 
+    inset 0 -1px 0 #a7a6a6,   /* bottom  */
+    inset 1px 0 0 #a7a6a6;    /* right  */
+    text-align: left;
+    font-weight: 600;
+    padding: 9px 10px;
+    color: #495057;
+    white-space: nowrap;
+}
+
+table tbody td {
+    padding: 8px 10px;
+    border-bottom: 1px solid #eee;
+    border-right: 1px solid #eee;
+    vertical-align: middle;
+}
+
+table thead th:first-child {
+    box-shadow: inset 0 -1px 0 #a7a6a6;
+}
+
+table tbody td:last-child {
+    border-right: none;
+}
+
+table tbody tr:hover {
+    background-color: #f2f2f2;
+}
+
+.id-col {
+    color: #adb5bd;
+    font-size: 0.8rem;
+    width: 40px;
+}
+
+.work-color-col {
+    width: 10px;
+    padding: 10px;
+    font-size: 0.65rem;
+    text-align: center;
+}
+
+.work-color {
+    padding: 0;
+    cursor: pointer;
+}
+
+.work-color:hover {
+    background: #bbc1c869;
+}
+
+.work-color .color-popover {
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.work-color:hover::after {
+    content: attr(data-work);
+}
+
+.date-col {
+    width: 60px;
+    text-align: left;
+}
+
+.date-col:empty:hover::after {
+    content: attr(data-date);
+    top: 6px;
+}
+
+.amount {
+    cursor: pointer;
+    width: 95px;
+}
+
+.shipping {
+    width: 90px;
+}
+
+.status {
+    padding: 0;
+    color: #333;
+    font-weight: bold;
+    font-size: 1rem;
+    width: 30px;
+    text-align: center;
+}
+
+.status .color-popover {
+    top: 50%;
+    left: -45px;
+    transform: translateY(-50%);
+}
+
+.status[data-tip]:hover::after {
+    content: attr(data-tip);
+    font-weight: normal;
+}
+
+.status.merge-pending .shippingMark {
+    color: #aaa;
+    cursor: pointer;
+}
+
+.status.no-hover .shippingMark {
+    cursor: default;
+}
+
+.editable {
+  cursor: pointer;
+}
+
+.editable:hover {
+  background-color: #dfd2d250;
+}
+
+.category-col {
+    font-size: 0.8rem;
+    color: #686a6d;
+    width: 120px;
+}
+
+tr.selected {
+    outline: 1px solid #3e8bb8;
+    background-color: #e7f1f8;
+    cursor: pointer;
+ }
+
+tfoot td {
+    font-weight: bold;
+    background-color: #fafafa;
+    padding-top: 7px;
+    padding-bottom: 7px;
+    white-space: nowrap;
+    box-shadow: inset 0 1px 0 #58535387;
+  }
+  
+#total-amount {
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.merge-bar {
+    display: none;
+}
+
+.merge-bar.active {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    background: #fff7dd;
+    border: 1px solid #efeadb;
+    padding: 8px;
+    position: sticky;
+    top: 0px;
+    z-index: 5;
+}
+
+.merge-bar button {
+    padding: 6px 10px;
+    font-size: 0.8rem;
+    color: white;
+    border: none;
+}
+
+#mergeCount {
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+#clearMergeBtn {
+    background: #c7ba82;
+}
+
+#clearMergeBtn:hover {
+    background: #a29a5d;
+}
+
+#confirmMergeBtn {
+    background: #3e8bb8;
+}
+  
+#confirmMergeBtn:hover {
+    background: #2f6f95;
+}
+  
+#exitMergeBtn {
+    background: #e57373;
+}
+  
+#exitMergeBtn:hover {
+    background: #c85a5a;
+}
+
+.empty-state {
+  padding: 40px;
+  text-align: center;
+  color: #666;
+  font-size: 1rem;
+}
+
+.empty-text {
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.empty-tip {
+  font-size: 0.9rem;
+  color: #999;
+}
