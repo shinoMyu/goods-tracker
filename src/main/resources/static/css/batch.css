@@ -30,7 +30,7 @@
 
 .item-row {
     position: relative;
-    border-top: 1px dashed #ddd;
+    border-top: 2px dashed #ddd;
     padding-top: 25px;
 }
   
@@ -97,10 +97,9 @@
     top: 8px;
     right: 8px;  
     background: #fc7373;
-    width: 45px;
-    padding: 5px;
-    font-size: 0.8rem;
-
+    width: 48px;
+    padding: 7px;
+    font-size: 0.85rem;
 }
   
 .remove-btn:hover {

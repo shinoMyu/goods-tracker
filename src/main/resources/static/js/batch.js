@@ -16,7 +16,7 @@ function reindex() {
 
 function updateIndex() {
   document.querySelectorAll(".item-row").forEach((row, i) => {
-    row.querySelector(".item-index").textContent = `第 ${i+1} 筆`;
+    row.querySelector(".item-index").textContent = `第 ${i + 1} 筆`;
   });
 }
 
@@ -40,7 +40,9 @@ function createRow() {
   const newRow = template.cloneNode(true);
   newRow.style.display = "block";
   newRow.removeAttribute("id");
-  
+
+  newRow.querySelectorAll("p").forEach(e => e.remove());
+
   setupPaymentRow(newRow, true);
 
   const last = items.lastElementChild;
@@ -51,23 +53,48 @@ function createRow() {
   return newRow;
 }
 
-// 初始化兩筆
 window.addEventListener("DOMContentLoaded", () => {
-  items.appendChild(createRow());
-  items.appendChild(createRow());
+  if (serverItems && serverItems.length > 0) {
+
+    serverItems.forEach(item => {
+      const row = createRow();
+
+      row.querySelector('[data-field="itemName"]').value = item.itemName || "";
+      row.querySelector('[data-field="workTitle"]').value = item.workTitle || "";
+      row.querySelector('[data-field="category"]').value = item.category || "";
+
+      if (item.errors && item.errors.length > 0) {
+        const box = row.querySelector(".form-error");
+
+        item.errors.forEach(err => {
+          const p = document.createElement("p");
+          p.textContent = err;
+          box.appendChild(p);
+        });
+      }
+
+      items.appendChild(row);
+    });
+
+  } else {
+    items.appendChild(createRow());
+    items.appendChild(createRow());
+  }
+
   reindex();
   updateIndex();
 });
 
 document.addEventListener("click", e => {
   if (e.target.classList.contains("remove-btn")) {
-    const rows = document.querySelectorAll(".item-row");
+    const rows = document.querySelectorAll("#items .item-row");
     if (rows.length <= 1) {
       alert("至少要一筆");
       return;
     }
     e.target.closest(".item-row").remove();
     reindex();
+    updateIndex();
   }
 });
 

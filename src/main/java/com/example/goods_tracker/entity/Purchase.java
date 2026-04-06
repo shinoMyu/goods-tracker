@@ -1,13 +1,16 @@
 package com.example.goods_tracker.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.time.LocalDate;
 import java.math.BigDecimal;
 
-@Data
 @Entity
 @Table(name = "purchase")
+@Getter
+@Setter
 public class Purchase {
 
     @Id

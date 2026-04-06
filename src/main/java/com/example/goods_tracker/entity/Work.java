@@ -1,10 +1,12 @@
 package com.example.goods_tracker.entity;
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
 @Entity
 @Table(name = "work")
+@Getter
+@Setter
 public class Work {
 
     @Id

@@ -1,9 +1,8 @@
-.form-error {
+.form-error p {
     color: #b00020;
     background: #fdecea;
     border: 1px solid #f5c2c0;
-    padding: 0 12px;
-    margin: 0 0 16px;
+    padding: 5px 12px;
     border-radius: 6px;
     font-size: 0.9rem;
     text-align: center;

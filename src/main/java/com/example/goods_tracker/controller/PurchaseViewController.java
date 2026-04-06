@@ -4,14 +4,17 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
+import com.example.goods_tracker.dto.*;
 import com.example.goods_tracker.entity.*;
 import com.example.goods_tracker.repository.*;
 
@@ -55,8 +58,7 @@ public class PurchaseViewController {
         return "purchases/list";
     }
 
-    private void prepareForm(Model model, Purchase purchase) {
-        model.addAttribute("purchase", purchase);
+    private void prepareForm(Model model) {
         model.addAttribute("works", workRepository.findAll());
         model.addAttribute("categories", purchaseRepository.findAllCategories());
     }
@@ -87,15 +89,16 @@ public class PurchaseViewController {
     public String newPurchaseForm(Model model) {
         Purchase purchase = createDefaultPurchase();
 
-        prepareForm(model, purchase);
+        prepareForm(model);
         model.addAttribute("minDate", getMinDate());
+        model.addAttribute("purchase", purchase);
         return "purchases/new";
     }
 
     private LocalDate parseMonth(String month) {
         return LocalDate.parse(month + "-01");
     }
-    
+
     private Work findOrCreateWork(String title) {
         return workRepository.findByTitle(title)
                 .orElseGet(() -> {
@@ -171,7 +174,7 @@ public class PurchaseViewController {
     private String returnWithError(Model model, Purchase purchase, String workTitle) {
         model.addAttribute("minDate", getMinDate());
         model.addAttribute("workTitle", workTitle);
-        prepareForm(model, purchase);
+        prepareForm(model);
         return "purchases/new";
     }
 
@@ -233,11 +236,93 @@ public class PurchaseViewController {
 
     @GetMapping("/batch")
     public String batchForm(Model model) {
-        LocalDate minDate = purchaseRepository.findEarliestPurchaseDate().orElse(LocalDate.now());
-        Purchase base = createDefaultPurchase();
-        model.addAttribute("minDate", minDate);
-        model.addAttribute("basePurchase", base);
-        prepareForm(model, new Purchase());
+        BatchRequest request = new BatchRequest();
+
+        request.setItems(new ArrayList<>());
+
+        model.addAttribute("request", request);
+        model.addAttribute("basePurchase", createDefaultPurchase());
+        model.addAttribute("minDate", getMinDate());
+        prepareForm(model);
         return "purchases/batch";
+    }
+
+    @PostMapping("/batch")
+    public String createBatch(
+            @Valid @ModelAttribute BatchRequest request,
+            BindingResult bindingResult,
+            Model model) {
+        boolean hasError = false;
+
+        if (bindingResult.hasErrors()) {
+
+            for (FieldError error : bindingResult.getFieldErrors()) {
+
+                String field = error.getField();
+
+                int start = field.indexOf('[');
+                int end = field.indexOf(']');
+                int index = Integer.parseInt(field.substring(start + 1, end));
+
+                String message = error.getDefaultMessage();
+
+                request.getItems().get(index).getErrors().add(message);
+            }
+            hasError = true;
+        }
+
+        for (BatchItem item : request.getItems()) {
+
+            PaymentValidationResult result = validatePayment(
+                    item.getPayMode(),
+                    item.getTotalPrice(),
+                    item.getDeposit(),
+                    item.getBalance());
+
+            if (result.getError() != null) {
+                item.getErrors().add(result.getError());
+                hasError = true;
+            }
+        }
+
+        if (hasError) {
+            model.addAttribute("request", request);
+            model.addAttribute("minDate", getMinDate());
+            model.addAttribute("basePurchase", createDefaultPurchase());
+            prepareForm(model);
+
+            return "purchases/batch";
+        }
+
+        LocalDate date = parseMonth(request.getPurchaseMonth());
+
+        for (BatchItem item : request.getItems()) {
+
+            Purchase purchase = new Purchase();
+
+            purchase.setPurchaseDate(date);
+            purchase.setPaymentSource(request.getPaymentSource());
+            purchase.setPurchaseType(request.getPurchaseType());
+            purchase.setReceived(request.getReceived());
+
+            purchase.setCategory(item.getCategory());
+            purchase.setItemName(item.getItemName());
+
+            purchase.setWork(findOrCreateWork(item.getWorkTitle()));
+            purchase.setOrder(createOrder());
+
+            PaymentValidationResult result = validatePayment(
+                    item.getPayMode(),
+                    item.getTotalPrice(),
+                    item.getDeposit(),
+                    item.getBalance());
+
+            purchase.setTotalPrice(result.getTotal());
+
+            purchaseRepository.save(purchase);
+
+            savePayment(purchase, item.getPayMode(), item.getDeposit(), item.getBalance());
+        }
+        return "redirect:/purchases/view";
     }
 }

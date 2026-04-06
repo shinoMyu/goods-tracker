@@ -15,14 +15,15 @@
   <div class="container batch">
     <h1>新增購買紀錄</h1>
 
-    <form th:action="@{/purchases/batch}" th:object="${basePurchase}" method="post">
+    <form th:action="@{/purchases/batch}" th:object="${request}" method="post">
 
       <div class="section">
         <h3>共通設定</h3>
         <div class="form-grid">
           <div class="form-group">
             <label>日期</label>
-            <input type="month" name="purchaseMonth" th:value="${#temporals.format(basePurchase.purchaseDate, 'yyyy-MM')}"
+            <input type="month" name="purchaseMonth"
+              th:value="${#temporals.format(basePurchase.purchaseDate, 'yyyy-MM')}"
               th:min="${#temporals.format(minDate, 'yyyy-MM')}" required>
           </div>
 
@@ -52,61 +53,67 @@
           </div>
         </div>
       </div>
-      
+
       <div class="section">
         <h3>購入内容</h3>
         <div id="items"></div>
-
-        <div id="template" class="item-row" style="display:none">
-          <div class="item-index"></div>
-          <p class="form-error" th:if="${error}" th:text="${error}"></p>
-          <div class="form-group">
-            <label>作品</label>
-            <input list="works" data-field="workTitle" placeholder="輸入或選擇作品" required>
-            <datalist id="works">
-              <option th:each="w : ${works}" th:value="${w.title}"></option>
-            </datalist>
-          </div>
-
-          <div class="form-group">
-            <label>種類</label>
-            <input list="categories" data-field="category" placeholder="輸入或選擇種類" required>
-            <datalist id="categories">
-              <option th:each="c : ${categories}" th:value="${c}"></option>
-            </datalist>
-          </div>
-
-          <div class="form-group">
-            <label>名稱</label>
-            <input type="text" data-field="itemName" required>
-          </div>
-
-          <div class="form-group">
-            <label>金額</label>
-            <input type="number" step="0.01" min="0" class="amountInput" data-field="totalPrice">
-            <div class="installmentBox" style="display:none">
-              <input type="number" step="0.01" min="0" class="depositInput" data-field="deposit" placeholder="訂金">
-              <input type="number" step="0.01" min="0" class="balanceInput" data-field="balance" placeholder="尾款">
-              <div class="total">總金額：<span class="totalPreview">0</span></div>
-            </div>
-            <div class="paymentOptions" style="display:none">
-              <label><input type="radio" data-field="payMode" value="single" checked>一次付款</label>
-              <label><input type="radio" data-field="payMode" value="deposit">只有訂金</label>
-              <label><input type="radio" data-field="payMode" value="installment">分期</label>
-            </div>
-            <button type="button" class="remove-btn">刪除</button>
-          </div>
-        </div>
+        
         <button type="button" id="addRow" class="add-btn">＋</button>
       </div>
       <button type="submit">儲存</button>
     </form>
+
+    <div id="template" class="item-row" style="display:none">
+      <div class="item-index"></div>
+      <div class="form-error"></div>
+
+      <div class="form-group">
+        <label>作品</label>
+        <input list="works" data-field="workTitle" th:value="${workTitle}" placeholder="輸入或選擇作品" required>
+        <datalist id="works">
+          <option th:each="w : ${works}" th:value="${w.title}"></option>
+        </datalist>
+      </div>
+
+      <div class="form-group">
+        <label>種類</label>
+        <input list="categories" data-field="category" placeholder="輸入或選擇種類" required>
+        <datalist id="categories">
+          <option th:each="c : ${categories}" th:value="${c}"></option>
+        </datalist>
+      </div>
+
+      <div class="form-group">
+        <label>名稱</label>
+        <input type="text" data-field="itemName" required>
+      </div>
+
+      <div class="form-group">
+        <label>金額</label>
+        <input type="number" step="0.01" min="0" class="amountInput" data-field="totalPrice">
+        <div class="installmentBox" style="display:none">
+          <input type="number" step="0.01" min="0" class="depositInput" data-field="deposit" placeholder="訂金">
+          <input type="number" step="0.01" min="0" class="balanceInput" data-field="balance" placeholder="尾款">
+          <div class="total">總金額：<span class="totalPreview">0</span></div>
+        </div>
+        <div class="paymentOptions" style="display:none">
+          <label><input type="radio" data-field="payMode" value="single" checked>一次付款</label>
+          <label><input type="radio" data-field="payMode" value="deposit">只有訂金</label>
+          <label><input type="radio" data-field="payMode" value="installment">分期</label>
+        </div>
+        <button type="button" class="remove-btn">刪除</button>
+      </div>
+    </div>
 
     <div class="form-footer">
       <a href="/purchases/view">返回列表</a>
       <a href="/purchases/new">單筆新增</a>
     </div>
   </div>
+
+  <script th:inline="javascript">
+    const serverItems = [[${request.items}]];
+  </script>
   <script th:src="@{/js/paymentRow.js}" defer></script>
   <script th:src="@{/js/batch.js}" defer></script>
 </body>

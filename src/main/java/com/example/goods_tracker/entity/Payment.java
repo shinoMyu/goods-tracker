@@ -1,11 +1,13 @@
 package com.example.goods_tracker.entity;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
 @Entity
 @Table(name = "payment")
+@Getter
+@Setter
 public class Payment {
     
     @Id
