@@ -30,9 +30,15 @@
 }
 
 .dropdown {
+    display: none;
+}
+
+.dropdown.open{
     position: absolute;
-    top: 30px;
+    top: 33px;
     right: 0;
+    display: flex;
+    gap: 5px;
     background: white;
     border: 1px solid #ccc;
     border-radius: 8px;

@@ -1,8 +1,6 @@
 package com.example.goods_tracker.controller;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,10 +15,9 @@ import org.springframework.web.bind.annotation.*;
 import com.example.goods_tracker.dto.*;
 import com.example.goods_tracker.entity.*;
 import com.example.goods_tracker.repository.*;
+import com.example.goods_tracker.service.*;
 
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 
 @Controller
 @RequestMapping("/purchases")
@@ -28,18 +25,20 @@ public class PurchaseViewController {
 
     private final PurchaseRepository purchaseRepository;
     private final WorkRepository workRepository;
-    private final PaymentRepository paymentRepository;
-    private final OrderRepository orderRepository;
+    private final PurchaseService purchaseService;
+    private final PaymentService paymentService;
 
     public PurchaseViewController(
             PurchaseRepository purchaseRepository,
             WorkRepository workRepository,
+            PurchaseService purchaseService,
             PaymentRepository paymentRepository,
-            OrderRepository orderRepository) {
+            OrderRepository orderRepository,
+            PaymentService paymentService) {
         this.purchaseRepository = purchaseRepository;
         this.workRepository = workRepository;
-        this.paymentRepository = paymentRepository;
-        this.orderRepository = orderRepository;
+        this.purchaseService = purchaseService;
+        this.paymentService = paymentService;
     }
 
     @GetMapping("/view")
@@ -63,116 +62,16 @@ public class PurchaseViewController {
         model.addAttribute("categories", purchaseRepository.findAllCategories());
     }
 
-    private Purchase createDefaultPurchase() {
-        Optional<LocalDate> lastDate = purchaseRepository.findLatestPurchaseDate();
-        LocalDate defaultDate = lastDate.orElse(LocalDate.now());
-
-        Purchase purchase = new Purchase();
-        purchase.setPurchaseDate(defaultDate);
-
-        Purchase last = purchaseRepository.findTopByOrderByIdDesc();
-        if (last != null) {
-            purchase.setPaymentSource(last.getPaymentSource());
-            purchase.setPurchaseType(last.getPurchaseType());
-        }
-
-        return purchase;
-    }
-
-    private LocalDate getMinDate() {
-        return purchaseRepository
-                .findEarliestPurchaseDate()
-                .orElse(LocalDate.now());
-    }
-
     @GetMapping("/new")
     public String newPurchaseForm(Model model) {
-        Purchase purchase = createDefaultPurchase();
-
         prepareForm(model);
-        model.addAttribute("minDate", getMinDate());
-        model.addAttribute("purchase", purchase);
+        model.addAttribute("minDate", purchaseService.getMinDate());
+        model.addAttribute("purchase", purchaseService.createDefaultPurchase());
         return "purchases/new";
     }
 
-    private LocalDate parseMonth(String month) {
-        return LocalDate.parse(month + "-01");
-    }
-
-    private Work findOrCreateWork(String title) {
-        return workRepository.findByTitle(title)
-                .orElseGet(() -> {
-                    Work w = new Work();
-                    w.setTitle(title);
-                    return workRepository.save(w);
-                });
-    }
-
-    private Order createOrder() {
-        Order order = new Order();
-        return orderRepository.save(order);
-    }
-
-    @Getter
-    @AllArgsConstructor
-    public class PaymentValidationResult {
-        private String error;
-        private BigDecimal total;
-    }
-
-    private PaymentValidationResult validatePayment(
-            String payMode,
-            BigDecimal totalPrice,
-            BigDecimal deposit,
-            BigDecimal balance) {
-
-        if ("single".equals(payMode)) {
-            if (totalPrice == null) {
-                return new PaymentValidationResult("請輸入金額", null);
-            }
-            return new PaymentValidationResult(null, totalPrice);
-        }
-
-        if ("deposit".equals(payMode)) {
-            if (deposit == null) {
-                return new PaymentValidationResult("請輸入訂金", null);
-            }
-            return new PaymentValidationResult(null, deposit);
-        }
-
-        // installment
-        if (deposit == null || balance == null) {
-            return new PaymentValidationResult("請輸入訂金和尾款", null);
-        }
-
-        return new PaymentValidationResult(null, deposit.add(balance));
-    }
-
-    private void savePayment(
-            Purchase purchase,
-            String payMode,
-            BigDecimal deposit,
-            BigDecimal balance) {
-
-        if (!"single".equals(payMode)) {
-            Payment p = new Payment();
-            p.setPurchase(purchase);
-            p.setPaymentType("deposit");
-            p.setPaidAmount(deposit);
-            paymentRepository.save(p);
-        }
-
-        if ("installment".equals(payMode)) {
-            Payment p = new Payment();
-            p.setPurchase(purchase);
-            p.setPaymentType("balance");
-            p.setPaidAmount(balance);
-            paymentRepository.save(p);
-        }
-    }
-
     private String returnWithError(Model model, Purchase purchase, String workTitle) {
-        model.addAttribute("minDate", getMinDate());
+        model.addAttribute("minDate", purchaseService.getMinDate());
         model.addAttribute("workTitle", workTitle);
         prepareForm(model);
         return "purchases/new";
@@ -190,8 +89,6 @@ public class PurchaseViewController {
             @RequestParam(required = false) BigDecimal balance,
             Model model) {
 
-        purchase.setPurchaseDate(parseMonth(purchaseMonth));
-
         boolean hasError = false;
 
         if (bindingResult.hasErrors()) {
@@ -203,7 +100,15 @@ public class PurchaseViewController {
             hasError = true;
         }
 
-        PaymentValidationResult result = validatePayment(payMode, totalPrice, deposit, balance);
+        PaymentService.PaymentResult result = purchaseService.createPurchase(
+                purchase,
+                purchaseMonth,
+                workTitle,
+                payMode,
+                totalPrice,
+                deposit,
+                balance);
+                
         if (result.getError() != null) {
             model.addAttribute("paymentError", result.getError());
             hasError = true;
@@ -213,13 +118,6 @@ public class PurchaseViewController {
             return returnWithError(model, purchase, workTitle);
         }
 
-        purchase.setWork(findOrCreateWork(workTitle));
-        purchase.setOrder(createOrder());
-        purchase.setTotalPrice(result.getTotal());
-
-        purchaseRepository.save(purchase);
-
-        savePayment(purchase, payMode, deposit, balance);
         return "redirect:/purchases/view";
     }
 
@@ -241,8 +139,8 @@ public class PurchaseViewController {
         request.setItems(new ArrayList<>());
 
         model.addAttribute("request", request);
-        model.addAttribute("basePurchase", createDefaultPurchase());
-        model.addAttribute("minDate", getMinDate());
+        model.addAttribute("basePurchase", purchaseService.createDefaultPurchase());
+        model.addAttribute("minDate", purchaseService.getMinDate());
         prepareForm(model);
         return "purchases/batch";
     }
@@ -273,7 +171,7 @@ public class PurchaseViewController {
 
         for (BatchItem item : request.getItems()) {
 
-            PaymentValidationResult result = validatePayment(
+            PaymentService.PaymentResult result = paymentService.validate(
                     item.getPayMode(),
                     item.getTotalPrice(),
                     item.getDeposit(),
@@ -287,41 +185,15 @@ public class PurchaseViewController {
 
         if (hasError) {
             model.addAttribute("request", request);
-            model.addAttribute("minDate", getMinDate());
-            model.addAttribute("basePurchase", createDefaultPurchase());
+            model.addAttribute("minDate", purchaseService.getMinDate());
+            model.addAttribute("basePurchase", purchaseService.createDefaultPurchase());
             prepareForm(model);
 
             return "purchases/batch";
         }
 
-        LocalDate date = parseMonth(request.getPurchaseMonth());
-
         for (BatchItem item : request.getItems()) {
-
-            Purchase purchase = new Purchase();
-
-            purchase.setPurchaseDate(date);
-            purchase.setPaymentSource(request.getPaymentSource());
-            purchase.setPurchaseType(request.getPurchaseType());
-            purchase.setReceived(request.getReceived());
-
-            purchase.setCategory(item.getCategory());
-            purchase.setItemName(item.getItemName());
-
-            purchase.setWork(findOrCreateWork(item.getWorkTitle()));
-            purchase.setOrder(createOrder());
-
-            PaymentValidationResult result = validatePayment(
-                    item.getPayMode(),
-                    item.getTotalPrice(),
-                    item.getDeposit(),
-                    item.getBalance());
-
-            purchase.setTotalPrice(result.getTotal());
-
-            purchaseRepository.save(purchase);
-
-            savePayment(purchase, item.getPayMode(), item.getDeposit(), item.getBalance());
+            purchaseService.createBatchItem(request, item);
         }
         return "redirect:/purchases/view";
     }

@@ -4,7 +4,7 @@ const mergeModeBtn = document.getElementById("mergeModeBtn");
 const dropdown = document.querySelector(".dropdown");
 
 moreBtn.addEventListener("click", () => {
-  dropdown.classList.toggle("hidden");
+  dropdown.classList.toggle("open");
 });
 
 document.addEventListener("click", (e) => {

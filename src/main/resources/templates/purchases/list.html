@@ -16,8 +16,9 @@
       <a href="/purchases/new" class="btn-add">新增購買</a>
       <div id="menu" class="menu">
         <button id="moreBtn" class="btn-more">⋯</button>
-        <div class="dropdown hidden">
+        <div class="dropdown">
           <button id="mergeModeBtn">合併出貨</button>
+          <button id="editModeBtn">編輯模式</button>
         </div>
       </div>
     </div>
@@ -37,10 +38,11 @@
         <th>日期</th>
         <th>名稱</th>
         <th>金額</th>
-        <th></th>
+        <th class="extra-col"></th>
         <th>郵費</th>
         <th>狀態</th>
         <th class="category-col">種類</th>
+        <th class="action-col"></th>
       </tr>
     </thead>
 
@@ -55,11 +57,24 @@
                       ? #temporals.format(p.purchaseDate,'yyyy-MM') 
                       : ''}" th:attr="data-date=${#temporals.format(p.purchaseDate,'yyyy-MM')}">
         </td>
-        <td th:text="${p.itemName}"></td>
+
+        <td class="name-col">
+          <span class="text" th:text="${p.itemName}"></span>
+          <input class="edit-input hidden" type="text"/>
+          <div class="note-text hidden" th:text="${p.note}"></div>
+          <textarea class="edit-note hidden" placeholder="備註"></textarea>
+        </td>
+
         <td class="amount" th:attr="data-id=${p.id},data-price=${p.totalPrice.stripTrailingZeros().toPlainString()},
           data-source=${p.paymentSource},data-type=${p.purchaseType}"
           th:text="${p.totalPrice.stripTrailingZeros().toPlainString()}"></td>
-        <td></td>
+
+          <td class="extra">
+          <span class="text"></span>
+          <input class="extra-amount hidden" type="number"/>
+          <input class="extra-note hidden" type="text" placeholder="說明"/>
+        </td>
+
         <td class="shipping" 
             th:attr="data-order=${p.order?.id},
                     data-order-count=${p.order != null ? orderCountMap[p.order.id] : 0}
@@ -70,6 +85,11 @@
               data-shipping=${p.order?.shippingFee}, data-color=${p.order?.color}"
               ><span class="shippingMark" th:if="${p.received}">✓</span></td>
         <td class="category-col" th:text="${p.category}"></td>
+        <td class="action-col">
+          <button class="edit-btn" style="display:none">Edit</button>
+          <button class="save-btn" style="display:none">Save</button>
+          <button class="cancel-btn" style="display:none">Cancel</button>
+        </td>
       </tr>
 
     <tr th:if="${#lists.isEmpty(purchases)}">
@@ -97,5 +117,6 @@
   <script th:src="@{/js/shippingEdit.js}" defer></script>
   <script th:src="@{/js/status.js}" defer></script>
   <script th:src="@{/js/orderColor.js}" defer></script>
+  <script th:src="@{/js/editMode.js}" defer></script>
 </body>
 </html>
