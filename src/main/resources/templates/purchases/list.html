@@ -58,10 +58,12 @@
                       : ''}" th:attr="data-date=${#temporals.format(p.purchaseDate,'yyyy-MM')}">
         </td>
 
-        <td class="name-col">
-          <span class="text" th:text="${p.itemName}"></span>
-          <input class="edit-input hidden" type="text"/>
-          <div class="note-text hidden" th:text="${p.note}"></div>
+        <td class="name-col" th:attr="data-note=${p.note}" th:classappend="${p.note} ? 'has-note'">
+          <div class="name-wrapper">
+            <span class="text" th:text="${p.itemName}"></span>
+            <input class="edit-input hidden" type="text"/>
+            <button class="note-toggle hidden">新增備註</button>
+          </div>
           <textarea class="edit-note hidden" placeholder="備註"></textarea>
         </td>
 
@@ -79,7 +81,10 @@
             th:attr="data-order=${p.order?.id},
                     data-order-count=${p.order != null ? orderCountMap[p.order.id] : 0}
             "><span th:text="${p.order?.shippingFee != null 
-              ? p.order.shippingFee.stripTrailingZeros().toPlainString() : ''}"></span></td>
+              ? p.order.shippingFee.stripTrailingZeros().toPlainString() : ''}"></span>
+          <!-- <div class="note-text hidden" th:text="${p.note}"></div> -->
+        </td>
+        
         <td class="status tooltip"
             th:attr="data-order=${p.order?.id}, data-received=${p.received},
               data-shipping=${p.order?.shippingFee}, data-color=${p.order?.color}"
@@ -113,6 +118,7 @@
   <script th:src="@{/js/mergeMode.js}" defer></script>
   <script th:src="@{/js/ui-utils.js}" defer></script>
   <script th:src="@{/js/workColor.js}" defer></script>
+  <script th:src="@{/js/notePopover.js}" defer></script>
   <script th:src="@{/js/paymentPopover.js}" defer></script>
   <script th:src="@{/js/shippingEdit.js}" defer></script>
   <script th:src="@{/js/status.js}" defer></script>

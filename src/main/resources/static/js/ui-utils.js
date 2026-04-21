@@ -1,3 +1,25 @@
+function createPopover(target, html, className = "popover") {
+  document.querySelectorAll(`.${className}`).forEach(p => p.remove());
+
+  const box = document.createElement("div");
+  box.className = className;
+  box.innerHTML = html;
+
+  target.appendChild(box);
+
+  return box;
+}
+
+function enablePopoverAutoClose() {
+  document.addEventListener("click", (e) => {
+    document.querySelectorAll(".payment-popover, .note-popover").forEach(p => {
+      if (!p.contains(e.target) && !e.target.closest("[data-popover-trigger]")) {
+        p.remove();
+      }
+    });
+  });
+}
+
 let currentPopover = null;
 
 function closePopover() {

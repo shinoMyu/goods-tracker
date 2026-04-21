@@ -197,4 +197,16 @@ public class PurchaseViewController {
         }
         return "redirect:/purchases/view";
     }
+
+    @PutMapping("/{id}")
+    @ResponseBody
+    public Purchase updatePurchase(@PathVariable Integer id,
+                                @RequestBody Map<String, String> body) {
+
+        return purchaseService.updatePurchase(
+            id,
+            body.get("itemName"),
+            body.get("note")
+        );
+    }
 }

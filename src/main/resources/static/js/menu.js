@@ -9,11 +9,11 @@ moreBtn.addEventListener("click", () => {
 
 document.addEventListener("click", (e) => {
   if (!menu.contains(e.target) && !moreBtn.contains(e.target)) {
-    dropdown.classList.add("hidden");
+    dropdown.classList.remove("open");
   }
 });
 
 mergeModeBtn.onclick = () => {
   startMergeMode();
-  dropdown.classList.add("hidden");
+  dropdown.classList.remove("open");
 };

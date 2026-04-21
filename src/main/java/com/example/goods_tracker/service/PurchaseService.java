@@ -135,4 +135,19 @@ public class PurchaseService {
 
         return result;
     }
+
+    public Purchase updatePurchase(Integer id, String name, String note) {
+        Purchase p = purchaseRepository.findById(id).orElseThrow();
+
+        if (name != null) {
+            if (name.trim().isEmpty()) {
+                throw new IllegalArgumentException("名稱不能為空");
+            }
+            p.setItemName(name.trim());
+        }
+        if (note != null) {
+            p.setNote(note);
+        }
+        return purchaseRepository.save(p);
+    }
 }

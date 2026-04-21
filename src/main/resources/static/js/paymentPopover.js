@@ -33,7 +33,6 @@ function paymentRow(p){
 }
 
 async function showPopover(cell, id) {
-
     const res = await fetch(`/payment/purchase/${id}`);
     const payments = await res.json();
 
@@ -56,27 +55,20 @@ async function showPopover(cell, id) {
             html += `<div>類型：${typeMap[purchase.purchaseType]}</div>`;
         }
 
-        let box = document.createElement("div");
-        box.className = "payment-popover";
-        box.innerHTML = html;
-
-        cell.appendChild(box);  
+    createPopover(cell, html, "payment-popover");
 }
 
 document.querySelectorAll(".amount").forEach(cell => {
     const id = cell.dataset.id;
     initDepositLabel(cell, id);
 
+    cell.setAttribute("data-popover-trigger", "");
+
     cell.addEventListener("click", () => {
         showPopover(cell, id);
     });
 });
 
-document.addEventListener("click", (e) => {
-    const popovers = document.querySelectorAll(".payment-popover");
-    popovers.forEach(p => {
-        if (!p.contains(e.target) && !e.target.closest(".amount")) {
-        p.remove();
-      }
-    });  
+document.addEventListener("DOMContentLoaded", () => {
+  enablePopoverAutoClose();
 });
