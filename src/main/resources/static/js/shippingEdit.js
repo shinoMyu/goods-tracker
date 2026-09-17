@@ -1,50 +1,52 @@
 document.querySelectorAll(".shipping").forEach(cell => {
-  let original = "";
-
   cell.addEventListener("dblclick", () => {
     if (!cell.classList.contains("editable")) return;
 
-    original = cell.textContent.trim();
-
-    cell.contentEditable = true;
-    cell.focus();
-  });
-
-  cell.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      cell.blur();
-    }
-  });
-
-  cell.addEventListener("blur", async () => {
-    if (!cell.isContentEditable) return;
-    cell.contentEditable = false;
+    if (typeof isEditMode !== "undefined" && isEditMode) return;
 
     const orderId = cell.dataset.order;
-    const value = cell.textContent.trim();
+    if (!orderId) return;
 
-    if (value === original) return;
+    const html = `
+      <input type="number" class="shipping-fee-input" placeholder="郵費" step="0.01" min="0" />
+      <input type="text" class="shipping-note-input" placeholder="說明（可選）" />
+      <div class="shipping-popover-actions">
+        <button type="button" class="confirm">確認</button>
+        <button type="button" class="cancel">取消</button>
+      </div>
+    `;
+    const popover = createPopover(cell, html, "shipping-popover");
 
-    const fee = parseFloat(value);
-    if (isNaN(fee)) {
-      alert("請輸入數字");
-      cell.textContent = original;
-      return;
-    }
+    const feeInput = popover.querySelector(".shipping-fee-input");
+    const noteInput = popover.querySelector(".shipping-note-input");
+    feeInput.focus();
 
-    await fetch(`/orders/${orderId}/shipping`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(fee)
-    });
+    popover.querySelector(".cancel").onclick = () => popover.remove();
 
-    const row = cell.closest("tr");
-    const status = row.querySelector(".status");
+    popover.querySelector(".confirm").onclick = async () => {
+      const fee = feeInput.value.trim();
+      if (!fee) {
+        alert("請輸入郵費");
+        return;
+      }
+      const note = noteInput.value.trim();
 
-    status.dataset.shipping = fee;
-    updateRowUI(row);
+      await fetch(`/orders/${orderId}/shipping`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ shipping: fee, shippingNote: note })
+      });
+
+      cell.querySelector(".text").textContent = fee;
+      const noteText = cell.querySelector(".note-text");
+      if (noteText) noteText.textContent = note;
+
+      popover.remove();
+
+      const row = cell.closest("tr");
+      const status = row.querySelector(".status");
+      status.dataset.shipping = fee;
+      updateRowUI(row);
+    };
   });
 });

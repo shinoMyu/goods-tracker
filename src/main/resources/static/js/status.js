@@ -1,6 +1,6 @@
 document.querySelectorAll(".status").forEach(cell => {
     const row = cell.closest("tr");
-    
+
     updateRowUI(row);
 
     cell.addEventListener("dblclick", async () => {
@@ -13,18 +13,28 @@ document.querySelectorAll(".status").forEach(cell => {
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify({received: true})
+                body: JSON.stringify({ received: true })
             });
 
-            // 更新 UI（不用 reload）
+            // 更新 UI
             cell.textContent = "✓";
             cell.dataset.received = "true";
-            
+
             updateRowUI(row);
 
             const workColor = row.querySelector(".work-color");
-            workColor.dataset.received = "true";          
-            applyWorkColor(workColor);  
+            const workId = workColor.dataset.workId;
+
+            const source = document.querySelector(
+                `.work-color[data-work-id='${workId}'][data-color]`
+            );
+
+            if (source) {
+                workColor.dataset.color = source.dataset.color;
+            }
+
+            workColor.dataset.received = "true";
+            applyWorkColor(workColor);
         }
     });
 });

@@ -207,6 +207,14 @@ public class PurchaseViewController {
             id,
             body.get("itemName"),
             body.get("note")
-        );
+        );  
+    }
+
+    @PutMapping("/{id}/extra")
+    @ResponseBody
+    public void updateExtra(@PathVariable Integer id,
+                            @RequestBody Map<String, String> body) {
+        Purchase purchase = purchaseRepository.findById(id).orElseThrow();
+        paymentService.updateExtra(purchase, body);
     }
 }

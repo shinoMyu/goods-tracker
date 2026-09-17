@@ -16,4 +16,6 @@ public class Order {
     private Integer id;
     private BigDecimal shippingFee; 
     private String color;
+    private String shippingNote;
+    private Boolean noShipping;
 }

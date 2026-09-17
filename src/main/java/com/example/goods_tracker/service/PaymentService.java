@@ -1,6 +1,8 @@
 package com.example.goods_tracker.service;
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
 
 import com.example.goods_tracker.entity.*;
 import com.example.goods_tracker.repository.*;
@@ -18,6 +20,10 @@ public class PaymentService {
         this.paymentRepository = paymentRepository;
     }
 
+    public List<Payment> getPaymentsByPurchaseId(Integer purchaseId) {
+        return paymentRepository.findByPurchaseId(purchaseId);
+    }
+
     @Getter
     @AllArgsConstructor
     public static class PaymentResult {
@@ -26,9 +32,9 @@ public class PaymentService {
     }
 
     public PaymentResult validate(String payMode,
-                                  BigDecimal totalPrice,
-                                  BigDecimal deposit,
-                                  BigDecimal balance) {
+            BigDecimal totalPrice,
+            BigDecimal deposit,
+            BigDecimal balance) {
 
         if ("single".equals(payMode)) {
             if (totalPrice == null) {
@@ -52,9 +58,9 @@ public class PaymentService {
     }
 
     public void save(Purchase purchase,
-                     String payMode,
-                     BigDecimal deposit,
-                     BigDecimal balance) {
+            String payMode,
+            BigDecimal deposit,
+            BigDecimal balance) {
 
         if (!"single".equals(payMode)) {
             Payment p = new Payment();
@@ -71,5 +77,27 @@ public class PaymentService {
             p.setPaidAmount(balance);
             paymentRepository.save(p);
         }
+    }
+
+    public void updateExtra(Purchase purchase, Map<String, String> body) {
+
+        Payment payment = paymentRepository
+                .findByPurchaseIdAndPaymentType(purchase.getId(), "extra")
+                .orElseGet(() -> {
+                    Payment p = new Payment();
+                    p.setPurchase(purchase);
+                    p.setPaymentType("extra");
+                    return p;
+                });
+
+        if (body.containsKey("extra")) {
+            payment.setPaidAmount(new BigDecimal(body.get("extra")));
+        }
+
+        if (body.containsKey("extraNote")) {
+            payment.setNote(body.get("extraNote"));
+        }
+
+        paymentRepository.save(payment);
     }
 }

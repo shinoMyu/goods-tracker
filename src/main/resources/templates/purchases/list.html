@@ -38,7 +38,7 @@
         <th>日期</th>
         <th>名稱</th>
         <th>金額</th>
-        <th class="extra-col"></th>
+        <th></th>
         <th>郵費</th>
         <th>狀態</th>
         <th class="category-col">種類</th>
@@ -58,7 +58,7 @@
                       : ''}" th:attr="data-date=${#temporals.format(p.purchaseDate,'yyyy-MM')}">
         </td>
 
-        <td class="name-col" th:attr="data-note=${p.note}" th:classappend="${p.note} ? 'has-note'">
+        <td class="name-col edit-cell" th:attr="data-note=${p.note}" th:classappend="${p.note} ? 'has-note'" data-field="itemName">
           <div class="name-wrapper">
             <span class="text" th:text="${p.itemName}"></span>
             <input class="edit-input hidden" type="text"/>
@@ -71,18 +71,21 @@
           data-source=${p.paymentSource},data-type=${p.purchaseType}"
           th:text="${p.totalPrice.stripTrailingZeros().toPlainString()}"></td>
 
-          <td class="extra">
+        <td class="extra edit-cell" data-field="extra">
           <span class="text"></span>
-          <input class="extra-amount hidden" type="number"/>
-          <input class="extra-note hidden" type="text" placeholder="說明"/>
+          <input class="edit-input hidden" type="number"/>
+          <div class="note-text hidden" th:text="${p.note}"></div>
+          <input class="edit-mini-note hidden" type="text" placeholder="說明"></input>
         </td>
 
-        <td class="shipping" 
+        <td class="shipping edit-cell" th:classappend="${p.note} ? 'has-note'" data-field="shipping"
             th:attr="data-order=${p.order?.id},
                     data-order-count=${p.order != null ? orderCountMap[p.order.id] : 0}
-            "><span th:text="${p.order?.shippingFee != null 
+            "><span class="text" th:text="${p.order?.shippingFee != null 
               ? p.order.shippingFee.stripTrailingZeros().toPlainString() : ''}"></span>
-          <!-- <div class="note-text hidden" th:text="${p.note}"></div> -->
+          <input class="edit-input hidden" type="number"/>
+          <div class="note-text hidden" th:text="${p.order?.shippingNote}"></div>
+          <input class="edit-mini-note hidden" type="text" placeholder="說明"></input>
         </td>
         
         <td class="status tooltip"
@@ -107,7 +110,7 @@
 
     <tfoot>
       <tr th:if="${not #lists.isEmpty(purchases)}">
-        <td colspan="7"></td>
+        <td class="total-spacer" colspan="7"></td>
         <td id="total-amount">總計：</td>
         <td></td>
       </tr>

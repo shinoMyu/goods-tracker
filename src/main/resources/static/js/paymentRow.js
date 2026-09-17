@@ -58,3 +58,10 @@ function setupPaymentRow(row, isBatchMode = false) {
     depositInput.addEventListener("input", updateTotal);
     balanceInput.addEventListener("input", updateTotal);
 }
+    
+// 單筆新增頁自動初始化
+document.addEventListener("DOMContentLoaded", () => {
+    if (document.querySelector("#amountInput")) {
+        setupPaymentRow(document);
+    }
+});

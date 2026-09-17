@@ -56,14 +56,6 @@
     position: relative;
 }
 
-.name-col {
-    position: relative;
-}
-
-.name-col[data-tip]:hover::before {
-  content: attr(data-tip);
-}
-
 .color-popover {
     position: absolute;
     background: white;
@@ -71,6 +63,7 @@
     padding: 4px;
     border-radius: 6px;
     box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    z-index: 999;
 }
 
 .color-picker {
@@ -97,26 +90,6 @@ input[type="color"] {
     border-radius: 3px;
 }
 
-.tooltip:hover::after,
-.name-col[data-tip]:hover::before,
-.status[data-tip]::after {
-    position: absolute;
-    top: -20px;
-    left: 0;
-    z-index: 10;
-    background: #333;
-    color: white;
-    padding: 2px 6px;
-    font-size: 0.75rem;
-    border-radius: 3px;
-    white-space: nowrap;
-    pointer-events: none;
-}
-
-.date-col {
-    position: relative;
-}
-
 .note-popover {
     right: 20px;
     top: 10px;
@@ -127,7 +100,8 @@ input[type="color"] {
 }
 
 .note-popover,
-.payment-popover {
+.payment-popover,
+.shipping-popover {
     position: absolute;
     background: white;
     padding: 8px;
@@ -135,6 +109,61 @@ input[type="color"] {
     border: 1px solid #a8a7a7;
     border-radius: 5%;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.shipping-popover {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    z-index: 50;
+    width: 110px;
+}
+
+.shipping-popover input[type="number"],
+.shipping-popover input[type="text"] {
+    padding: 4px 6px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    font-size: 0.85rem;
+}
+
+.shipping-popover-actions {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+}
+
+.shipping-popover-actions button {
+    padding: 4px 10px;
+    border: 1px solid #a8a7a7;
+    background: white;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 0.8rem;
+}
+
+.shipping-popover-actions .confirm {
+    background: #4a4a4a;
+    color: white;
+    border-color: #4a4a4a;
+}
+
+.shipping-popover-actions .cancel {
+    background: white;
+    color: #666;
+}
+
+.no-shipping-popover {
+    width: auto;
+    min-width: 110px;
+    align-items: center;
+}
+
+.no-shipping-label {
+    font-size: 0.85rem;
+    color: #333;
+    text-align: center;
+    margin-bottom: 2px;
 }
 
 .status {

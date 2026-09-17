@@ -12,7 +12,7 @@ function createPopover(target, html, className = "popover") {
 
 function enablePopoverAutoClose() {
   document.addEventListener("click", (e) => {
-    document.querySelectorAll(".payment-popover, .note-popover").forEach(p => {
+    document.querySelectorAll(".payment-popover, .note-popover, .shipping-popover").forEach(p => {
       if (!p.contains(e.target) && !e.target.closest("[data-popover-trigger]")) {
         p.remove();
       }
@@ -65,12 +65,26 @@ function showColorPicker(cell, onPreview) {
   });
 }
 
-function showConfirm(element, onConfirm) {
+function showConfirm(element, onConfirm, pos = "below") {
+  const rect = element.getBoundingClientRect();
+
   const box = openPopover(
     element,
     `<button class="color-confirm">確認</button>`,
     "self"
   );
+
+  box.style.position = "fixed";
+
+  if (pos === "right") {
+    box.style.left = rect.right + 5 + "px";
+    box.style.top = rect.top + rect.height / 2 + "px";
+    box.style.transform = "translateY(-50%)";
+  } else {
+    box.style.left = rect.left + rect.width / 2 + "px";
+    box.style.top = rect.bottom + 5 + "px";
+    box.style.transform = "translateX(-50%)";
+  }
 
   box.querySelector("button").onclick = (e) => {
     e.stopPropagation();
@@ -106,7 +120,9 @@ function updateRowUI(row) {
 
   const orderCount = parseInt(shipping.dataset.orderCount || "0");
   const hasColor = status.dataset.color;
-  
+  const noShipping = shipping.dataset.noShipping === "true";
+  const inEditMode = typeof isEditMode !== "undefined" && isEditMode;
+
   const orderId = status.dataset.order;
   let isLast = false;
 
@@ -121,11 +137,29 @@ function updateRowUI(row) {
     all.forEach(cell => {
       const row = cell.closest("tr");
       const shippingCell = row.querySelector(".shipping");
-  
+
       if (cell !== last) {
         shippingCell.textContent = "";
       }
     });
+  }
+
+  if (inEditMode) {
+    if (status.dataset.color) {
+      shipping.style.color = status.dataset.color;
+    }
+    return;
+  }
+
+  // 無郵費：鎖住一切 popover / tooltip / hover
+  if (noShipping) {
+    setEditable(shipping, false);
+    shipping.removeAttribute("data-tip");
+    status.removeAttribute("data-tip");
+    status.classList.remove("merge-pending");
+    status.style.cursor = "default";
+    status.classList.add("no-hover");
+    return;
   }
 
   // tooltip
@@ -143,7 +177,7 @@ function updateRowUI(row) {
     }
   } else {
     status.removeAttribute("data-tip");
-  }  
+  }
 
   // editable
   if (received && !hasShipping) {
@@ -156,6 +190,12 @@ function updateRowUI(row) {
     }
   } else {
     setEditable(shipping, false);
+  }
+
+  if (shipping.classList.contains("editable")) {
+    shipping.dataset.tip = "雙擊輸入郵費";
+  } else {
+    shipping.removeAttribute("data-tip");
   }
 
   if (orderCount > 1 && !hasShipping && !hasColor) {

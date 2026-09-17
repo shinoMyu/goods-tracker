@@ -8,34 +8,43 @@ function canEdit(row) {
   return isEditMode && editingRow === row;
 }
 
-function getNameParts(row) {
-  const nameCol = row.querySelector(".name-col");
-
+function getParts(cell) {
   return {
-    nameCol,
-    text: nameCol.querySelector(".text"),
-    input: nameCol.querySelector(".edit-input"),
-    textarea: nameCol.querySelector(".edit-note"),
-    noteBtn: nameCol.querySelector(".note-toggle"),
-    note: nameCol.dataset.note || "",
-    hasNote: (nameCol.dataset.note || "").trim() !== ""
+    text: cell.querySelector(".text"),
+    input: cell.querySelector(".edit-input"),
+    textarea: cell.querySelector(".edit-note"),
+    noteBtn: cell.querySelector(".note-toggle"),
+    noteText: cell.querySelector(".note-text"),
+    miniNoteInput: cell.querySelector(".edit-mini-note"),
   };
 }
 
 function resetRow(row) {
   delete row.dataset.noteOpen;
+  delete row.dataset.noShippingChanged;
+  delete row.dataset.origNoShipping;
 
-  const { text, input, textarea, noteBtn, hasNote } = getNameParts(row);
+  row.querySelectorAll(".edit-cell").forEach(cell => {
+    const { text, input, textarea, noteBtn, noteText, miniNoteInput } = getParts(cell);
 
-  // 名稱還原
-  text.classList.remove("hidden");
-  input.classList.add("hidden");
+    if (text) text.classList.remove("hidden");
+    if (input) input.classList.add("hidden");
 
-  // note 還原
-  textarea.classList.add("hidden");
-  textarea.value = "";
+    if (textarea) {
+      textarea.classList.add("hidden");
+      textarea.value = "";
+    }
 
-  noteBtn.classList.toggle("hidden", hasNote);
+    if (noteBtn && noteText) {
+      const hasNote = noteText.textContent.trim() !== "";
+      noteBtn.classList.toggle("hidden", hasNote);
+    }
+
+    if (miniNoteInput) {
+      miniNoteInput.classList.add("hidden");
+      miniNoteInput.value = "";
+    }
+  });
 }
 
 function render() {
@@ -70,12 +79,43 @@ function render() {
     row.style.opacity = state === "locked" ? "0.5" : "1";
     row.style.pointerEvents = state === "locked" ? "none" : "auto";
 
-    const { nameCol, noteBtn, hasNote } = getNameParts(row);
+    const nameCol = row.querySelector(".name-col");
+    const { noteBtn } = getParts(nameCol);
+    const hasNote = (nameCol.dataset.note || "").trim() !== "";
 
-    if (isEditMode) {
+    const extraCol = row.querySelector(".extra");
+    const shippingCol = row.querySelector(".shipping");
+    const statusCol = row.querySelector(".status");
+
+    const shippingText = shippingCol.querySelector(".text");
+    const hasShipping = (shippingText?.textContent || "").trim() !== "";
+    const orderCount = parseInt(shippingCol.dataset.orderCount || "0");
+    const isReceived = statusCol?.dataset.received === "true";
+    const noShipping = shippingCol.dataset.noShipping === "true";
+    const canEditShipping = isReceived && hasShipping && orderCount === 1 && !noShipping;
+    const canSetNoShipping = isReceived && orderCount === 1 && !hasShipping && !noShipping;
+
+    if (state === "editing") {
       nameCol.dataset.tip = "雙擊修改名稱";
-    } else {
+      extraCol.dataset.tip = "雙擊新增額外費用";
+      statusCol.removeAttribute("data-tip");
+      if (canEditShipping) {
+        shippingCol.dataset.tip = "雙擊修改郵費";
+      } else if (canSetNoShipping || noShipping) {
+        shippingCol.dataset.tip = "右鍵切換無郵費";
+      } else {
+        shippingCol.removeAttribute("data-tip");
+      }
+    } else if (state === "view") {
       nameCol.removeAttribute("data-tip");
+      extraCol.removeAttribute("data-tip");
+      shippingCol.removeAttribute("data-tip");
+      statusCol.removeAttribute("data-tip");
+    } else if (state === "locked") {
+      nameCol.removeAttribute("data-tip");
+      extraCol.removeAttribute("data-tip");
+      shippingCol.removeAttribute("data-tip");
+      statusCol.removeAttribute("data-tip");
     }
 
     if (state === "editing") {
@@ -90,36 +130,125 @@ function render() {
   });
 }
 
-function buildUpdatePayload(row) {
-  const body = {};
+function buildPayload(cell) {
+  const { text, input, textarea, noteText, miniNoteInput } = getParts(cell);
+  const payload = { changed: false, body: {} };
 
-  const inputEl = row.querySelector(".edit-input");
-  const textEl = row.querySelector(".text");
+  if (!input || input.classList.contains("hidden")) return payload;
 
-  const textarea = row.querySelector(".edit-note");
+  const newValue = input.value.trim();
+  const oldValue = (text.textContent || "").trim();
 
-  // 名稱
-  if (!inputEl.classList.contains("hidden")) {
-    const newName = inputEl.value.trim();
-    const oldName = textEl.textContent.trim();
-
-    if (newName !== oldName) {
-      body.itemName = newName;
-    }
+  if (newValue !== oldValue) {
+    payload.body[cell.dataset.field] = newValue;
+    payload.changed = true;
   }
 
-  // note
-  if (!textarea.classList.contains("hidden")) {
+  // name-col 的長備註
+  if (cell.classList.contains("name-col") && textarea && !textarea.classList.contains("hidden")) {
     const newNote = textarea.value;
-    const cell = row.querySelector(".name-col");
     const oldNote = cell.dataset.note || "";
-
     if (newNote !== oldNote) {
-      body.note = newNote;
+      payload.body.note = newNote;
+      payload.changed = true;
     }
   }
 
-  return body;
+  // extra / shipping 的 mini note
+  if (
+    (cell.classList.contains("extra") || cell.classList.contains("shipping")) &&
+    miniNoteInput && !miniNoteInput.classList.contains("hidden")
+  ) {
+    const newNote = miniNoteInput.value;
+    const oldNote = (noteText?.textContent || "").trim();
+    if (newNote !== oldNote) {
+      payload.body[cell.dataset.field + "Note"] = newNote;
+      payload.changed = true;
+    }
+  }
+
+  return payload;
+}
+
+function resolveEndpoint(cell, row) {
+  if (cell.classList.contains("name-col")) {
+    return { url: `/purchases/${row.dataset.id}`, method: "PUT" };
+  }
+  if (cell.classList.contains("shipping")) {
+    const orderId = cell.dataset.order;
+    if (!orderId) return null;
+    return { url: `/orders/${orderId}/shipping`, method: "PUT" };
+  }
+  if (cell.classList.contains("extra")) {
+    return { url: `/purchases/${row.dataset.id}/extra`, method: "PUT" };
+  }
+  return null;
+}
+
+function applyCellUpdate(cell, body) {
+  const { text, textarea, noteText, miniNoteInput } = getParts(cell);
+
+  if (body[cell.dataset.field] !== undefined) {
+    text.textContent = body[cell.dataset.field];
+  }
+
+  if (cell.classList.contains("name-col")) {
+    if (body.note !== undefined) {
+      cell.dataset.note = body.note;
+      cell.classList.toggle("has-note", body.note.trim() !== "");
+    }
+  }
+
+  if (cell.classList.contains("extra") || cell.classList.contains("shipping")) {
+    if (body[cell.dataset.field + "Note"] !== undefined && noteText) {
+      noteText.textContent = body[cell.dataset.field + "Note"];
+    }
+  }
+
+  if (cell.classList.contains("shipping") && body.shipping !== undefined) {
+    const row = cell.closest("tr");
+    const status = row.querySelector(".status");
+    status.dataset.shipping = body.shipping;
+    updateRowUI(row);
+  }
+}
+
+// shipping 數字有值時改值要跳警告確認
+function shouldWarnShippingChange(cell, body) {
+  if (!cell.classList.contains("shipping")) return false;
+  if (body.shipping === undefined) return false;
+
+  const text = cell.querySelector(".text");
+  const oldValue = (text?.textContent || "").trim();
+  return oldValue !== "";
+}
+
+async function saveCell(cell, row) {
+  const { changed, body } = buildPayload(cell);
+  if (!changed) return false;
+
+  const endpoint = resolveEndpoint(cell, row);
+  if (!endpoint) return false;
+
+  if (shouldWarnShippingChange(cell, body)) {
+    const ok = confirm("修改郵費會影響總額，確定要改嗎？");
+    if (!ok) {
+      // 還原 input 值
+      const input = cell.querySelector(".edit-input");
+      input.value = cell.querySelector(".text").textContent.trim();
+      delete body.shipping;
+      if (Object.keys(body).length === 0) return false;
+    }
+  }
+
+  await fetch(endpoint.url, {
+    method: endpoint.method,
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body)
+  });
+
+  applyCellUpdate(cell, body);
+  return true;
 }
 
 function bindRowEvents() {
@@ -138,47 +267,48 @@ function bindRowEvents() {
     };
 
     cancelBtn.onclick = () => {
+      // 恢復 noShipping 原值
+      if (row.dataset.noShippingChanged === "true") {
+        const shipping = row.querySelector(".shipping");
+        const orig = row.dataset.origNoShipping || "false";
+        shipping.dataset.noShipping = orig;
+        delete row.dataset.noShippingChanged;
+        delete row.dataset.origNoShipping;
+      }
+
       editingRow = null;
       resetRow(row);
       render();
+      updateRowUI(row);
     };
 
     saveBtn.onclick = async () => {
-      const id = row.dataset.id;
-      const body = buildUpdatePayload(row);
-
-      if (Object.keys(body).length === 0) {
-        editingRow = null;
-        resetRow(row);
-        render();
-        return;
+      let anyChange = false;
+      for (const cell of row.querySelectorAll(".edit-cell")) {
+        const changed = await saveCell(cell, row);
+        if (changed) anyChange = true;
       }
 
-      await fetch(`/purchases/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(body)
-      });
-
-      // 更新畫面
-      if (body.itemName !== undefined) {
-        row.querySelector(".text").textContent = body.itemName;
-      }
-
-      if (body.note !== undefined) {
-        const { nameCol } = getNameParts(row);
-
-        nameCol.dataset.note = body.note;
-        nameCol.classList.toggle("has-note", body.note.trim() !== "");
-
-        bindNotePopover(row.querySelector(".name-col"));
+      // noShipping 變化也要存
+      if (row.dataset.noShippingChanged === "true") {
+        const shipping = row.querySelector(".shipping");
+        const orderId = shipping.dataset.order;
+        if (orderId) {
+          await fetch(`/orders/${orderId}/no-shipping`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ value: shipping.dataset.noShipping === "true" })
+          });
+        }
+        delete row.dataset.noShippingChanged;
+        delete row.dataset.origNoShipping;
+        anyChange = true;
       }
 
       editingRow = null;
       resetRow(row);
       render();
+      updateRowUI(row);
     };
   });
 }
@@ -198,27 +328,14 @@ editModeBtn.addEventListener("click", () => {
   document.querySelector(".dropdown").classList.remove("open");
 
   render();
-});
 
-function enterNameEdit(cell) {
-  const row = cell.closest("tr");
-
-  const { text, input, textarea, noteBtn, note, hasNote } = getNameParts(row);
-
-  text.classList.add("hidden");
-  input.classList.remove("hidden");
-
-  input.value = text.textContent.trim();
-  input.focus();
-
-  const isOpen = row.dataset.noteOpen === "true";
-  const showNote = hasNote || isOpen;
-  textarea.classList.toggle("hidden", !showNote);
-  if (showNote) {
-    textarea.value = note;
+  if (!isEditMode) {
+    document.querySelectorAll("tbody tr").forEach(updateRowUI);
   }
-  noteBtn.classList.toggle("hidden", showNote);
-}
+
+  const spacer = document.querySelector(".total-spacer");
+  spacer.colSpan = isEditMode ? 8 : 7;
+});
 
 document.addEventListener("click", (e) => {
   const toggle = e.target.closest(".note-toggle");
@@ -234,22 +351,139 @@ document.addEventListener("click", (e) => {
   row.dataset.noteOpen = "true";
 });
 
+function enterEdit(cell) {
+  const text = cell.querySelector(".text");
+  const input = cell.querySelector(".edit-input");
+
+  if (!text || !input) return;
+
+  // shipping 只有「單獨出貨 + 已到貨 + 有郵費 + 非無郵費」才允許 editMode 編輯
+  if (cell.classList.contains("shipping")) {
+    const row = cell.closest("tr");
+    const statusCol = row.querySelector(".status");
+    const isReceived = statusCol?.dataset.received === "true";
+    const orderCount = parseInt(cell.dataset.orderCount || "0");
+    const hasShipping = text.textContent.trim() !== "";
+    const noShipping = cell.dataset.noShipping === "true";
+    if (!isReceived || orderCount !== 1 || !hasShipping || noShipping) {
+      return;
+    }
+  }
+
+  text.classList.add("hidden");
+  input.classList.remove("hidden");
+
+  input.value = text.textContent.trim();
+  input.focus();
+
+  if (cell.classList.contains("name-col")) {
+    handleNote(cell);
+  }
+
+  if (
+    cell.classList.contains("extra") ||
+    cell.classList.contains("shipping")
+  ) {
+    handleMiniNote(cell);
+  }
+}
+
+function handleNote(cell) {
+  const { textarea, noteBtn } = getParts(cell);
+  const row = cell.closest("tr");
+
+  if (!textarea || !noteBtn) return;
+
+  const note = cell.dataset.note || "";
+  const hasNote = note.trim() !== "";
+  const isOpen = row.dataset.noteOpen === "true";
+
+  const showNote = hasNote || isOpen;
+  textarea.classList.toggle("hidden", !showNote);
+  if (showNote) {
+    textarea.value = note;
+  }
+  noteBtn.classList.toggle("hidden", showNote);
+}
+
+function handleMiniNote(cell) {
+  const { noteText, miniNoteInput } = getParts(cell);
+
+  if (!noteText || !miniNoteInput) return;
+
+  noteText.classList.add("hidden");
+  miniNoteInput.classList.remove("hidden");
+
+  miniNoteInput.value = noteText.textContent.trim();
+}
+
 document.addEventListener("dblclick", (e) => {
-  const cell = e.target.closest("td");
+  const cell = e.target.closest(".edit-cell");
   if (!cell) return;
 
   const row = cell.closest("tr");
   if (!canEdit(row)) return;
 
-  if (cell.classList.contains("name-col")) {
-    enterNameEdit(cell);
-  }
-
-  if (cell.classList.contains("extra")) {
-    enterExtraEdit(cell);
-  }
-
-  if (cell.classList.contains("shipping")) {
-    enterShippingEdit(cell);
-  }
+  enterEdit(cell);
 });
+
+// 右鍵 shipping → 設為無郵費 / 取消無郵費
+// 條件：editMode + 正在 editing 這行 + 單獨出貨 + 已到貨
+document.addEventListener("contextmenu", (e) => {
+  const cell = e.target.closest(".shipping");
+  if (!cell) return;
+  if (!isEditMode) return;
+
+  const row = cell.closest("tr");
+  if (editingRow !== row) return;
+
+  const statusCol = row.querySelector(".status");
+  const isReceived = statusCol?.dataset.received === "true";
+  const orderCount = parseInt(cell.dataset.orderCount || "0");
+
+  if (!(isReceived && orderCount === 1)) return;
+
+  e.preventDefault();
+
+  showNoShippingMenu(cell, row);
+});
+
+function showNoShippingMenu(cell, row) {
+  closePopover();
+
+  const current = cell.dataset.noShipping === "true";
+  const label = current ? "取消無郵費" : "設為無郵費";
+  const newValue = !current;
+
+  if (row.dataset.origNoShipping === undefined) {
+    row.dataset.origNoShipping = cell.dataset.noShipping || "false";
+  }
+
+  const html = `
+    <div class="no-shipping-label">${label}？</div>
+    <div class="shipping-popover-actions">
+      <button type="button" class="confirm">確認</button>
+      <button type="button" class="cancel">取消</button>
+    </div>
+  `;
+
+  const box = createPopover(cell, html, "shipping-popover");
+  box.classList.add("no-shipping-popover");
+
+  box.querySelector(".confirm").onclick = (e) => {
+    e.stopPropagation();
+
+    cell.dataset.noShipping = String(newValue);
+    row.dataset.noShippingChanged = "true";
+
+    render();
+    updateRowUI(row);
+
+    box.remove();
+  };
+
+  box.querySelector(".cancel").onclick = (e) => {
+    e.stopPropagation();
+    box.remove();
+  };
+}

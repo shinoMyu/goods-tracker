@@ -75,11 +75,35 @@ table tbody tr:hover {
 .date-col {
     width: 60px;
     text-align: left;
+    position: relative;
 }
 
 .date-col:empty:hover::after {
     content: attr(data-date);
     top: 6px;
+}
+
+.name-col {
+    position: relative;
+}
+
+.name-col[data-tip]:hover::before {
+  content: attr(data-tip);
+}
+
+.tooltip:hover::after,
+[data-tip]:hover::before {
+    position: absolute;
+    top: -20px;
+    left: 0;
+    z-index: 10;
+    background: #333;
+    color: white;
+    padding: 2px 6px;
+    font-size: 0.75rem;
+    border-radius: 3px;
+    white-space: nowrap;
+    pointer-events: none;
 }
 
 .name-wrapper {
@@ -89,7 +113,7 @@ table tbody tr:hover {
     gap: 6px;
 }
 
-.edit-input {
+.name-col .edit-input {
     width: 100%;
     font-size: 0.9rem;
     padding: 4px 6px;
@@ -108,7 +132,8 @@ table tbody tr:hover {
   position: relative;
 }
 
-.name-col.has-note::after {
+.name-col.has-note::after,
+.shipping.has-note::after {
     content: "";
     position: absolute;
     top: 0;
@@ -117,16 +142,17 @@ table tbody tr:hover {
     border-left: 10px solid transparent;
 }
 
-.name-col.has-note:hover::after {
+.name-col.has-note:hover::after,
+.shipping.has-note:hover::after {
     border-top-color: #495057;
 }
 
 .note-toggle {
-    margin-left: 8px;
+    margin-left: 5px;
     font-size: 12px;
     background: #f5f5f5;
     color: #888;
-    cursor: pointer;
+    white-space: nowrap;
 }
 
 .note-toggle:hover {
@@ -134,16 +160,21 @@ table tbody tr:hover {
 }
 
 .edit-note {
-    margin-top: 6px;
-    width: 100%;
     min-height: 40px;
     font-size: 13px;
     padding: 4px 6px;
+}
+
+.edit-note,
+.edit-mini-note {
+    margin-top: 6px;
+    width: 100%;
     border: 1px solid #ddd;
     border-radius: 4px;
 }
 
-.edit-note:focus {
+.edit-note:focus,
+.edit-mini-note:focus {
     outline: none;
 }
 
@@ -152,15 +183,32 @@ table tbody tr:hover {
     width: 95px;
 }
 
-.extra-col {
+.extra {
     width: 60px;
+    position: relative;
+}
+
+.extra[data-tip]:hover::before {
+  content: attr(data-tip);
 }
 
 .shipping {
     width: 60px;
 }
 
-/* .shipping .note-text {
+.shipping .edit-input {
+    padding: 2px 6px;
+}
+
+.shipping {
+    position: relative;
+}
+
+.shipping[data-tip]:hover::before {
+  content: attr(data-tip);
+}
+
+.shipping .note-text {
     display: none;
     font-size: 12px;
     color: #888;
@@ -168,7 +216,19 @@ table tbody tr:hover {
 
 tr:not(.editing) .shipping:hover .note-text {
     display: block;
-} */
+}
+ 
+.extra .edit-input,
+.shipping .edit-input {
+  width: 70px;
+  padding: 2px 6px;
+  font-size: 13px;
+}
+
+.edit-mini-note {
+  font-size: 12px;
+  color: #666;
+}
 
 .status {
     padding: 0;
@@ -177,11 +237,13 @@ tr:not(.editing) .shipping:hover .note-text {
     font-size: 1rem;
     width: 30px;
     text-align: center;
+    position: relative;
 }
 
 .status .color-popover {
     top: 50%;
-    left: -45px;
+    left: 100%;
+    margin-left: 5px;
     transform: translateY(-50%);
 }
 
@@ -204,6 +266,13 @@ tr:not(.editing) .shipping:hover .note-text {
 }
 
 .editable:hover {
+    background-color: #dfd2d250;
+}
+
+tr:has(.shipping.editable:hover) .shipping.editable,
+tr:has(.shipping.editable:hover) .status,
+tr:has(.shipping.editable):has(.status:hover) .shipping.editable,
+tr:has(.shipping.editable):has(.status:hover) .status {
     background-color: #dfd2d250;
 }
 

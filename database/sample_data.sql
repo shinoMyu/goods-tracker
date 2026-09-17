@@ -1,5 +1,5 @@
 INSERT INTO orders (id) VALUES (1);
-INSERT INTO works (title, color) VALUES ('さらざんまい', '#388ab9');
+INSERT INTO work (title, color) VALUES ('さらざんまい', '#388ab9');
 INSERT INTO work (title) VALUES ('ID:INVADED');
 
 INSERT INTO purchase (order_id, work_id, purchase_date, item_name, category, total_price, payment_source, purchase_type, received) 
