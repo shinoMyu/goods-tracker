@@ -11,6 +11,8 @@ function startMergeMode() {
   mergeMode = true;
   selectedIds = [];
   mergeBar.classList.add("active");
+  mergeModeBtn.textContent = "退出合併";
+  if (typeof editModeBtn !== 'undefined') editModeBtn.disabled = true;
   updateCount();
 }
 
@@ -18,6 +20,8 @@ function exitMergeMode() {
   mergeMode = false;
   selectedIds = [];
   mergeBar.classList.remove("active");
+  mergeModeBtn.textContent = "合併出貨";
+  if (typeof editModeBtn !== 'undefined') editModeBtn.disabled = false;
   
   document.querySelectorAll("tr.selected").forEach(row => {
     row.classList.remove("selected");
@@ -61,6 +65,7 @@ document.querySelectorAll("tbody tr").forEach(row => {
       if (status.dataset.received !== "true") return;
 
       const shipping = row.querySelector(".shipping");
+      if (shipping.dataset.noShipping === "true") return;
       if (shipping.textContent.trim() !== "") return;
 
       const orderCount = parseInt(shipping.dataset.orderCount);
@@ -81,7 +86,7 @@ document.querySelectorAll("tbody tr").forEach(row => {
 
 confirmMergeBtn.addEventListener("click", async () => {
     if (selectedIds.length < 2) {
-      alert("至少選兩筆");
+      showToast("至少選兩筆");
       return;
     }
   

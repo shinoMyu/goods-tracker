@@ -222,3 +222,21 @@ function updateRowUI(row) {
     shipping.style.color = status.dataset.color;
   }
 }
+
+let toastTimer = null;
+function showToast(message, type = "error") {
+  let toast = document.querySelector(".app-toast");
+  if (!toast) {
+    toast = document.createElement("div");
+    toast.className = "app-toast";
+    document.body.appendChild(toast);
+  }
+  toast.textContent = message;
+  toast.className = `app-toast ${type}`;
+  toast.classList.add("show");
+
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => {
+    toast.classList.remove("show");
+  }, 2200);
+}

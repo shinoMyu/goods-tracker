@@ -52,6 +52,11 @@
     font-size: 0.8rem;
 }
 
+.dropdown button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
 .work-color {
     position: relative;
 }
@@ -164,6 +169,43 @@ input[type="color"] {
     color: #333;
     text-align: center;
     margin-bottom: 2px;
+}
+
+.app-toast {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-20px);
+    background: #444;
+    color: white;
+    padding: 10px 22px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.2);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.22s, transform 0.22s;
+    z-index: 9999;
+    white-space: pre-line;
+    line-height: 1.5;
+    text-align: center;
+}
+
+.app-toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+.app-toast.error {
+    background: #c0504d;
+}
+
+.app-toast.success {
+    background: #4a9d5f;
+}
+
+.app-toast.info {
+    background: #3e8bb8;
 }
 
 .status {

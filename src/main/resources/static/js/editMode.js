@@ -213,7 +213,6 @@ function applyCellUpdate(cell, body) {
   }
 }
 
-// shipping 數字有值時改值要跳警告確認
 function shouldWarnShippingChange(cell, body) {
   if (!cell.classList.contains("shipping")) return false;
   if (body.shipping === undefined) return false;
@@ -233,7 +232,6 @@ async function saveCell(cell, row) {
   if (shouldWarnShippingChange(cell, body)) {
     const ok = confirm("修改郵費會影響總額，確定要改嗎？");
     if (!ok) {
-      // 還原 input 值
       const input = cell.querySelector(".edit-input");
       input.value = cell.querySelector(".text").textContent.trim();
       delete body.shipping;
@@ -323,6 +321,7 @@ editModeBtn.addEventListener("click", () => {
   editingRow = null;
 
   editModeBtn.textContent = isEditMode ? "結束編輯" : "編輯模式";
+  mergeModeBtn.disabled = isEditMode;
   actionHeader.classList.toggle("edit-mode");
   actionHeader.textContent = isEditMode ? "編輯" : "";
   document.querySelector(".dropdown").classList.remove("open");

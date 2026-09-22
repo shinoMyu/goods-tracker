@@ -14,6 +14,10 @@ document.addEventListener("click", (e) => {
 });
 
 mergeModeBtn.onclick = () => {
-  startMergeMode();
+  if (mergeMode) {
+    exitMergeMode();
+  } else {
+    startMergeMode();
+  }
   dropdown.classList.remove("open");
 };
