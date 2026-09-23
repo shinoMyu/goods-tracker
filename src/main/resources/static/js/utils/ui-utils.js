@@ -1,3 +1,14 @@
+async function api(url, data, method = "POST") {
+  const res = await fetch(url, {
+    method,
+    headers: { "Content-Type": "application/json" },
+    body: data !== undefined ? JSON.stringify(data) : undefined
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const text = await res.text();
+  return text ? JSON.parse(text) : null;
+}
+
 function createPopover(target, html, className = "popover") {
   document.querySelectorAll(`.${className}`).forEach(p => p.remove());
 
@@ -240,3 +251,26 @@ function showToast(message, type = "error") {
     toast.classList.remove("show");
   }, 2200);
 }
+
+function bindNotePopover(cell) {
+    const note = (cell.dataset.note || "").trim();
+
+    if (!note) return;
+
+    cell.setAttribute("data-popover-trigger", "");
+
+    cell.onclick = () => {
+        const row = cell.closest("tr");
+        if (row.classList.contains("editing")) return;
+
+        createPopover(cell, `<div>${note}</div>`, "note-popover");
+    };
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll(".name-col").forEach(cell => {
+    bindNotePopover(cell);
+  });
+
+  enablePopoverAutoClose();
+});

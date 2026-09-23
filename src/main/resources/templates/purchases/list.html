@@ -111,21 +111,19 @@
     <tfoot>
       <tr th:if="${not #lists.isEmpty(purchases)}">
         <td class="total-spacer" colspan="7"></td>
-        <td id="total-amount">總計：</td>
+        <td id="total-amount" colspan="2">總計：</td>
         <td></td>
       </tr>
     </tfoot>
   </table>
 
-  <script th:src="@{/js/menu.js}" defer></script>
-  <script th:src="@{/js/ui-utils.js}" defer></script>
-  <script th:src="@{/js/mergeMode.js}" defer></script>
-  <script th:src="@{/js/workColor.js}" defer></script>
-  <script th:src="@{/js/notePopover.js}" defer></script>
-  <script th:src="@{/js/paymentPopover.js}" defer></script>
-  <script th:src="@{/js/shippingEdit.js}" defer></script>
-  <script th:src="@{/js/status.js}" defer></script>
-  <script th:src="@{/js/orderColor.js}" defer></script>
-  <script th:src="@{/js/editMode.js}" defer></script>
+  <script th:src="@{/js/utils/menu.js}" defer></script>
+  <script th:src="@{/js/utils/ui-utils.js}" defer></script>
+  <script th:src="@{/js/modes/mergeMode.js}" defer></script>
+  <script th:src="@{/js/colors/colorManager.js}" defer></script>
+  <script th:src="@{/js/popovers/paymentPopover.js}" defer></script>
+  <script th:src="@{/js/popovers/shippingEdit.js}" defer></script>
+  <script th:src="@{/js/features/status.js}" defer></script>
+  <script th:src="@{/js/modes/editMode.js}" defer></script>
 </body>
 </html>

@@ -114,8 +114,9 @@
   <script th:inline="javascript">
     const serverItems = [[${request.items}]];
   </script>
-  <script th:src="@{/js/paymentRow.js}" defer></script>
-  <script th:src="@{/js/batch.js}" defer></script>
+  <script th:src="@{/js/utils/ui-utils.js}" defer></script>
+  <script th:src="@{/js/batch/paymentRow.js}" defer></script>
+  <script th:src="@{/js/batch/batch.js}" defer></script>
 </body>
 
 </html>
