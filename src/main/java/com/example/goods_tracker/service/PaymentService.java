@@ -24,6 +24,15 @@ public class PaymentService {
         return paymentRepository.findByPurchaseId(purchaseId);
     }
 
+    public List<String> getExtraNotes() {
+        return paymentRepository.findDistinctNotesByPaymentType("extra");
+    }
+
+    public List<Payment> getExtrasByPurchaseIds(List<Integer> purchaseIds) {
+        if (purchaseIds.isEmpty()) return List.of();
+        return paymentRepository.findByPaymentTypeAndPurchaseIdIn("extra", purchaseIds);
+    }
+
     @Getter
     @AllArgsConstructor
     public static class PaymentResult {
@@ -95,7 +104,8 @@ public class PaymentService {
         }
 
         if (body.containsKey("extraNote")) {
-            payment.setNote(body.get("extraNote"));
+            String note = body.get("extraNote");
+            payment.setNote(note != null && note.isBlank() ? null : (note != null ? note.trim() : null));
         }
 
         paymentRepository.save(payment);

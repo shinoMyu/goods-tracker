@@ -27,8 +27,15 @@ function resetRow(row) {
   row.querySelectorAll(".edit-cell").forEach(cell => {
     const { text, input, textarea, noteBtn, noteText, miniNoteInput } = getParts(cell);
 
-    if (text) text.classList.remove("hidden");
-    if (input) input.classList.add("hidden");
+    if (cell.classList.contains("extra") || cell.classList.contains("shipping")) {
+      text.classList.remove("hidden");
+      const editBlock = cell.querySelector(".edit-block");
+      if (editBlock) editBlock.classList.add("hidden");
+      if (miniNoteInput) miniNoteInput.value = "";
+    } else {
+      if (text) text.classList.remove("hidden");
+      if (input) input.classList.add("hidden");
+    }
 
     if (textarea) {
       textarea.classList.add("hidden");
@@ -40,7 +47,7 @@ function resetRow(row) {
       noteBtn.classList.toggle("hidden", hasNote);
     }
 
-    if (miniNoteInput) {
+    if (cell.classList.contains("name-col") && miniNoteInput) {
       miniNoteInput.classList.add("hidden");
       miniNoteInput.value = "";
     }
@@ -97,7 +104,9 @@ function render() {
 
     if (state === "editing") {
       nameCol.dataset.tip = "雙擊修改名稱";
-      extraCol.dataset.tip = "雙擊新增額外費用";
+      const extraText = extraCol.querySelector(".text");
+      const hasExtra = (extraText?.textContent || "").trim() !== "";
+      extraCol.dataset.tip = hasExtra ? "雙擊修改額外費用" : "雙擊新增額外費用";
       statusCol.removeAttribute("data-tip");
       if (canEditShipping) {
         shippingCol.dataset.tip = "雙擊修改郵費";
@@ -134,17 +143,21 @@ function buildPayload(cell) {
   const { text, input, textarea, noteText, miniNoteInput } = getParts(cell);
   const payload = { changed: false, body: {} };
 
-  if (!input || input.classList.contains("hidden")) return payload;
+  const isExtraOrShipping = cell.classList.contains("extra") || cell.classList.contains("shipping");
+  const blockHidden = isExtraOrShipping
+    ? cell.querySelector(".edit-block")?.classList.contains("hidden")
+    : input?.classList.contains("hidden");
 
-  const newValue = input.value.trim();
-  const oldValue = (text.textContent || "").trim();
+  if (input && !blockHidden) {
+    const newValue = input.value.trim();
+    const oldValue = (text.textContent || "").trim();
 
-  if (newValue !== oldValue) {
-    payload.body[cell.dataset.field] = newValue;
-    payload.changed = true;
+    if (newValue !== oldValue) {
+      payload.body[cell.dataset.field] = newValue;
+      payload.changed = true;
+    }
   }
 
-  // name-col 的長備註
   if (cell.classList.contains("name-col") && textarea && !textarea.classList.contains("hidden")) {
     const newNote = textarea.value;
     const oldNote = cell.dataset.note || "";
@@ -154,11 +167,7 @@ function buildPayload(cell) {
     }
   }
 
-  // extra / shipping 的 mini note
-  if (
-    (cell.classList.contains("extra") || cell.classList.contains("shipping")) &&
-    miniNoteInput && !miniNoteInput.classList.contains("hidden")
-  ) {
+  if (isExtraOrShipping && miniNoteInput && !blockHidden) {
     const newNote = miniNoteInput.value;
     const oldNote = (noteText?.textContent || "").trim();
     if (newNote !== oldNote) {
@@ -170,6 +179,7 @@ function buildPayload(cell) {
   return payload;
 }
 
+// 依 cell class 決定 endpoint 與 method
 function resolveEndpoint(cell, row) {
   if (cell.classList.contains("name-col")) {
     return { url: `/purchases/${row.dataset.id}`, method: "PUT" };
@@ -196,17 +206,24 @@ function applyCellUpdate(cell, body) {
     if (body.note !== undefined) {
       cell.dataset.note = body.note;
       cell.classList.toggle("has-note", body.note.trim() !== "");
+      bindNotePopover(cell);
     }
   }
 
   if (cell.classList.contains("extra") || cell.classList.contains("shipping")) {
     if (body[cell.dataset.field + "Note"] !== undefined && noteText) {
       noteText.textContent = body[cell.dataset.field + "Note"];
+      cell.classList.toggle("has-note", body[cell.dataset.field + "Note"].trim() !== "");
     }
+  }
+
+  if (cell.classList.contains("extra") && body.extra !== undefined) {
+    cell.closest("tr").dataset.extra = body.extra;
   }
 
   if (cell.classList.contains("shipping") && body.shipping !== undefined) {
     const row = cell.closest("tr");
+    row.dataset.shipping = body.shipping;
     const status = row.querySelector(".status");
     status.dataset.shipping = body.shipping;
     updateRowUI(row);
@@ -239,13 +256,19 @@ async function saveCell(cell, row) {
     }
   }
 
-  await fetch(endpoint.url, {
-    method: endpoint.method,
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body)
-  });
+  await api(endpoint.url, body, endpoint.method);
 
   applyCellUpdate(cell, body);
+
+  if (cell.classList.contains("extra") && body.extraNote) {
+    const list = document.getElementById("extraNotesList");
+    if (list && !Array.from(list.options).some(o => o.value === body.extraNote)) {
+      const opt = document.createElement("option");
+      opt.value = body.extraNote;
+      list.appendChild(opt);
+    }
+  }
+
   return true;
 }
 
@@ -265,7 +288,6 @@ function bindRowEvents() {
     };
 
     cancelBtn.onclick = () => {
-      // 恢復 noShipping 原值
       if (row.dataset.noShippingChanged === "true") {
         const shipping = row.querySelector(".shipping");
         const orig = row.dataset.origNoShipping || "false";
@@ -287,16 +309,11 @@ function bindRowEvents() {
         if (changed) anyChange = true;
       }
 
-      // noShipping 變化也要存
       if (row.dataset.noShippingChanged === "true") {
         const shipping = row.querySelector(".shipping");
         const orderId = shipping.dataset.order;
         if (orderId) {
-          await fetch(`/orders/${orderId}/no-shipping`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ value: shipping.dataset.noShipping === "true" })
-          });
+          await api(`/orders/${orderId}/no-shipping`, { value: shipping.dataset.noShipping === "true" }, "PUT");
         }
         delete row.dataset.noShippingChanged;
         delete row.dataset.origNoShipping;
@@ -307,6 +324,7 @@ function bindRowEvents() {
       resetRow(row);
       render();
       updateRowUI(row);
+      if (typeof renderTotal === "function") renderTotal();
     };
   });
 }
@@ -317,6 +335,8 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 editModeBtn.addEventListener("click", () => {
+  const wasEditing = editingRow;
+
   isEditMode = !isEditMode;
   editingRow = null;
 
@@ -326,6 +346,10 @@ editModeBtn.addEventListener("click", () => {
   actionHeader.textContent = isEditMode ? "編輯" : "";
   document.querySelector(".dropdown").classList.remove("open");
 
+  if (!isEditMode && wasEditing) {
+    resetRow(wasEditing);
+  }
+
   render();
 
   if (!isEditMode) {
@@ -333,7 +357,7 @@ editModeBtn.addEventListener("click", () => {
   }
 
   const spacer = document.querySelector(".total-spacer");
-  spacer.colSpan = isEditMode ? 8 : 7;
+  if (spacer) spacer.colSpan = isEditMode ? 8 : 7;
 });
 
 document.addEventListener("click", (e) => {
@@ -356,7 +380,6 @@ function enterEdit(cell) {
 
   if (!text || !input) return;
 
-  // shipping 只有「單獨出貨 + 已到貨 + 有郵費 + 非無郵費」才允許 editMode 編輯
   if (cell.classList.contains("shipping")) {
     const row = cell.closest("tr");
     const statusCol = row.querySelector(".status");
@@ -370,7 +393,13 @@ function enterEdit(cell) {
   }
 
   text.classList.add("hidden");
-  input.classList.remove("hidden");
+
+  if (cell.classList.contains("extra") || cell.classList.contains("shipping")) {
+    const editBlock = cell.querySelector(".edit-block");
+    if (editBlock) editBlock.classList.remove("hidden");
+  } else {
+    input.classList.remove("hidden");
+  }
 
   input.value = text.textContent.trim();
   input.focus();
@@ -379,10 +408,7 @@ function enterEdit(cell) {
     handleNote(cell);
   }
 
-  if (
-    cell.classList.contains("extra") ||
-    cell.classList.contains("shipping")
-  ) {
+  if (cell.classList.contains("extra") || cell.classList.contains("shipping")) {
     handleMiniNote(cell);
   }
 }
@@ -411,8 +437,6 @@ function handleMiniNote(cell) {
   if (!noteText || !miniNoteInput) return;
 
   noteText.classList.add("hidden");
-  miniNoteInput.classList.remove("hidden");
-
   miniNoteInput.value = noteText.textContent.trim();
 }
 

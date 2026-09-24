@@ -47,9 +47,10 @@
     </thead>
 
     <tbody>
-      <tr th:each="p, pStat : ${purchases}" 
-          th:attr="data-id=${p.id},data-price=${p.totalPrice}">
-            <!-- data-shipping=${p.order?.shippingFee},data-extra=${p.extra}"> -->
+      <tr th:each="p, pStat : ${purchases}"
+          th:attr="data-id=${p.id},data-price=${p.totalPrice},
+                   data-shipping=${p.order?.shippingFee},
+                   data-extra=${extraMap[p.id]?.paidAmount}">
         <td class="id-col" th:text="${p.id}"></td>
         <td class="work-color tooltip" th:data-work-id="${p.work.id}" th:data-color="${p.work.color}"
           th:data-received="${p.received}" th:data-work="${p.work.title}"></td>
@@ -58,7 +59,7 @@
                       : ''}" th:attr="data-date=${#temporals.format(p.purchaseDate,'yyyy-MM')}">
         </td>
 
-        <td class="name-col edit-cell" th:attr="data-note=${p.note}" th:classappend="${p.note} ? 'has-note'" data-field="itemName">
+        <td class="name-col edit-cell" th:attr="data-note=${p.note}" th:classappend="${!#strings.isEmpty(#strings.trim(p.note))} ? 'has-note'" data-field="itemName">
           <div class="name-wrapper">
             <span class="text" th:text="${p.itemName}"></span>
             <input class="edit-input hidden" type="text"/>
@@ -72,20 +73,28 @@
           th:text="${p.totalPrice.stripTrailingZeros().toPlainString()}"></td>
 
         <td class="extra edit-cell" data-field="extra">
-          <span class="text"></span>
-          <input class="edit-input hidden" type="number"/>
-          <div class="note-text hidden" th:text="${p.note}"></div>
-          <input class="edit-mini-note hidden" type="text" placeholder="說明"></input>
+          <span class="text" th:text="${extraMap[p.id]?.paidAmount != null ? extraMap[p.id].paidAmount.stripTrailingZeros().toPlainString() : ''}"></span>
+          <div class="edit-block hidden">
+            <label class="edit-label">金額</label>
+            <input class="edit-input" type="number" placeholder="金額"/>
+            <label class="edit-label">說明</label>
+            <input class="edit-mini-note" type="text" list="extraNotesList" placeholder="說明"/>
+          </div>
+          <div class="note-text hidden" th:text="${extraMap[p.id]?.note}"></div>
         </td>
 
-        <td class="shipping edit-cell" th:classappend="${p.note} ? 'has-note'" data-field="shipping"
+        <td class="shipping edit-cell" th:classappend="${!#strings.isEmpty(#strings.trim(p.order?.shippingNote))} ? 'has-note'" data-field="shipping"
             th:attr="data-order=${p.order?.id},
-                    data-order-count=${p.order != null ? orderCountMap[p.order.id] : 0}
-            "><span class="text" th:text="${p.order?.shippingFee != null 
+                    data-order-count=${p.order != null ? orderCountMap[p.order.id] : 0},
+                    data-no-shipping=${p.order?.noShipping}"><span class="text" th:text="${p.order?.shippingFee != null 
               ? p.order.shippingFee.stripTrailingZeros().toPlainString() : ''}"></span>
-          <input class="edit-input hidden" type="number"/>
+          <div class="edit-block hidden">
+            <label class="edit-label">郵費</label>
+            <input class="edit-input" type="number" placeholder="郵費"/>
+            <label class="edit-label">說明</label>
+            <input class="edit-mini-note" type="text" placeholder="說明"/>
+          </div>
           <div class="note-text hidden" th:text="${p.order?.shippingNote}"></div>
-          <input class="edit-mini-note hidden" type="text" placeholder="說明"></input>
         </td>
         
         <td class="status tooltip"
@@ -94,9 +103,9 @@
               ><span class="shippingMark" th:if="${p.received}">✓</span></td>
         <td class="category-col" th:text="${p.category}"></td>
         <td class="action-col">
-          <button class="edit-btn" style="display:none">Edit</button>
-          <button class="save-btn" style="display:none">Save</button>
-          <button class="cancel-btn" style="display:none">Cancel</button>
+          <button class="edit-btn hidden">Edit</button>
+          <button class="save-btn hidden">Save</button>
+          <button class="cancel-btn hidden">Cancel</button>
         </td>
       </tr>
 
@@ -112,18 +121,22 @@
       <tr th:if="${not #lists.isEmpty(purchases)}">
         <td class="total-spacer" colspan="7"></td>
         <td id="total-amount" colspan="2">總計：</td>
-        <td></td>
       </tr>
     </tfoot>
   </table>
 
   <script th:src="@{/js/utils/menu.js}" defer></script>
   <script th:src="@{/js/utils/ui-utils.js}" defer></script>
+  <script th:src="@{/js/features/total.js}" defer></script>
   <script th:src="@{/js/modes/mergeMode.js}" defer></script>
   <script th:src="@{/js/colors/colorManager.js}" defer></script>
   <script th:src="@{/js/popovers/paymentPopover.js}" defer></script>
   <script th:src="@{/js/popovers/shippingEdit.js}" defer></script>
   <script th:src="@{/js/features/status.js}" defer></script>
   <script th:src="@{/js/modes/editMode.js}" defer></script>
+
+  <datalist id="extraNotesList">
+    <option th:each="note : ${extraNotes}" th:value="${note}"></option>
+  </datalist>
 </body>
 </html>

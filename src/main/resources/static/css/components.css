@@ -106,7 +106,8 @@ input[type="color"] {
 
 .note-popover,
 .payment-popover,
-.shipping-popover {
+.shipping-popover,
+.total-popover {
     position: absolute;
     background: white;
     padding: 8px;

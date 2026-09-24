@@ -55,7 +55,8 @@ public class OrderService {
         }
 
         if (body.containsKey("shippingNote")) {
-            order.setShippingNote(body.get("shippingNote"));
+            String note = body.get("shippingNote");
+            order.setShippingNote(note != null && note.isBlank() ? null : (note != null ? note.trim() : null));
         }
 
         orderRepository.save(order);

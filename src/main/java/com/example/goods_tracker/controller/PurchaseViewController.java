@@ -1,6 +1,7 @@
 package com.example.goods_tracker.controller;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.stream.Collectors;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,8 +33,6 @@ public class PurchaseViewController {
             PurchaseRepository purchaseRepository,
             WorkRepository workRepository,
             PurchaseService purchaseService,
-            PaymentRepository paymentRepository,
-            OrderRepository orderRepository,
             PaymentService paymentService) {
         this.purchaseRepository = purchaseRepository;
         this.workRepository = workRepository;
@@ -51,8 +50,17 @@ public class PurchaseViewController {
                         p -> p.getOrder().getId(),
                         Collectors.counting()));
 
-        model.addAttribute("purchases", purchaseRepository.findAllByOrderByIdAsc());
+        List<Payment> extras = paymentService.getExtrasByPurchaseIds(
+                purchases.stream().map(Purchase::getId).toList());
+        Map<Integer, Payment> extraMap = new HashMap<>();
+        for (Payment p : extras) {
+            extraMap.put(p.getPurchase().getId(), p);
+        }
+
+        model.addAttribute("purchases", purchases);
         model.addAttribute("orderCountMap", orderCountMap);
+        model.addAttribute("extraMap", extraMap);
+        model.addAttribute("extraNotes", paymentService.getExtraNotes());
 
         return "purchases/list";
     }
@@ -207,7 +215,8 @@ public class PurchaseViewController {
             id,
             body.get("itemName"),
             body.get("note")
-        );  
+        );
+        
     }
 
     @PutMapping("/{id}/extra")

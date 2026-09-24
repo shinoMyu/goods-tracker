@@ -23,7 +23,7 @@ function createPopover(target, html, className = "popover") {
 
 function enablePopoverAutoClose() {
   document.addEventListener("click", (e) => {
-    document.querySelectorAll(".payment-popover, .note-popover, .shipping-popover").forEach(p => {
+    document.querySelectorAll(".payment-popover, .note-popover, .shipping-popover, .total-popover").forEach(p => {
       if (!p.contains(e.target) && !e.target.closest("[data-popover-trigger]")) {
         p.remove();
       }
@@ -127,7 +127,7 @@ function updateRowUI(row) {
   const shipping = row.querySelector(".shipping");
 
   const received = status.dataset.received === "true";
-  const hasShipping = shipping.textContent.trim() !== "";
+  const hasShipping = status.dataset.shipping != null && status.dataset.shipping !== "";
 
   const orderCount = parseInt(shipping.dataset.orderCount || "0");
   const hasColor = status.dataset.color;
@@ -150,9 +150,19 @@ function updateRowUI(row) {
       const shippingCell = row.querySelector(".shipping");
 
       if (cell !== last) {
-        shippingCell.textContent = "";
+        const textSpan = shippingCell.querySelector(".text");
+        if (textSpan) textSpan.textContent = "";
       }
     });
+  }
+
+  if (noShipping) {
+    status.classList.remove("merge-pending");
+    status.classList.add("no-hover");
+    status.style.cursor = "default";
+  } else {
+    status.classList.remove("no-hover");
+    status.classList.remove("merge-pending");
   }
 
   if (inEditMode) {
@@ -162,14 +172,10 @@ function updateRowUI(row) {
     return;
   }
 
-  // 無郵費：鎖住一切 popover / tooltip / hover
   if (noShipping) {
     setEditable(shipping, false);
     shipping.removeAttribute("data-tip");
     status.removeAttribute("data-tip");
-    status.classList.remove("merge-pending");
-    status.style.cursor = "default";
-    status.classList.add("no-hover");
     return;
   }
 

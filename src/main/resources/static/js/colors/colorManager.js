@@ -102,5 +102,9 @@ registerColorFeature({
   apiPath: id => `/orders/${id}/color`,
   applyColor: applyOrderColor,
   previewAll: true,
-  confirmPos: "right"
+  confirmPos: "right",
+  extraClickCheck: (cell) => {
+    const shipping = cell.closest("tr")?.querySelector(".shipping");
+    return parseInt(shipping?.dataset.orderCount || "0") > 1;
+  }
 });

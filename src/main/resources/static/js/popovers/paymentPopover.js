@@ -15,8 +15,7 @@ const typeMap = {
 };
 
 async function initDepositLabel(cell, id) {
-    const res = await fetch(`/payment/purchase/${id}`);
-    const payments = await res.json();
+    const payments = await api(`/payment/purchase/${id}`, undefined, "GET");
 
     if (payments.length === 1 && payments[0].paymentType === "deposit") {
         const price = cell.dataset.price;
@@ -33,8 +32,8 @@ function paymentRow(p){
 }
 
 async function showPopover(cell, id) {
-    const res = await fetch(`/payment/purchase/${id}`);
-    const payments = await res.json();
+    const allPayments = await api(`/payment/purchase/${id}`, undefined, "GET");
+    const payments = allPayments.filter(p => p.paymentType !== "extra");
 
     document.querySelectorAll(".payment-popover").forEach(p => p.remove());        
         let html = "";

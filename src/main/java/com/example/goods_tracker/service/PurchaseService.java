@@ -146,7 +146,7 @@ public class PurchaseService {
             p.setItemName(name.trim());
         }
         if (note != null) {
-            p.setNote(note);
+            p.setNote(note.isBlank() ? null : note.trim());
         }
         return purchaseRepository.save(p);
     }

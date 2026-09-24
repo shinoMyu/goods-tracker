@@ -2,7 +2,7 @@ table {
     width: 100%;
     border-collapse: collapse;
     background-color: white;
-    font-size: 0.9rem;
+    font-size: clamp(0.8rem, 1.1vw, 0.9rem);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
@@ -119,9 +119,16 @@ table tbody tr:hover {
     padding: 4px 6px;
 }
 
+.edit-input {
+    border: 1px solid #d0d7de;
+    border-radius: 4px;
+    background: #f8f9fb;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
 .edit-input:focus {
     outline: none;
-    border: 1px solid #3e8bb8;
+    border-color: #3e8bb8;
     background: white;
     flex: 1; 
     box-shadow: 0 0 0 2px rgba(62,139,184,0.15);
@@ -160,22 +167,28 @@ table tbody tr:hover {
 }
 
 .edit-note {
-    min-height: 40px;
+    min-height: 55px;
     font-size: 13px;
-    padding: 4px 6px;
+    padding: 6px 8px;
 }
 
 .edit-note,
 .edit-mini-note {
     margin-top: 6px;
     width: 100%;
-    border: 1px solid #ddd;
+    border: 1px solid #d0d7de;
     border-radius: 4px;
+    background: #f8f9fb;
+    font-family: inherit;
+    transition: border-color 0.15s, box-shadow 0.15s;
 }
 
 .edit-note:focus,
 .edit-mini-note:focus {
     outline: none;
+    border-color: #3e8bb8;
+    background: white;
+    box-shadow: 0 0 0 2px rgba(62,139,184,0.15);
 }
 
 .amount {
@@ -194,13 +207,6 @@ table tbody tr:hover {
 
 .shipping {
     width: 60px;
-}
-
-.shipping .edit-input {
-    padding: 2px 6px;
-}
-
-.shipping {
     position: relative;
 }
 
@@ -208,26 +214,50 @@ table tbody tr:hover {
   content: attr(data-tip);
 }
 
-.shipping .note-text {
+.shipping .note-text,
+.extra .note-text {
     display: none;
     font-size: 12px;
     color: #888;
 }
 
-tr:not(.editing) .shipping:hover .note-text {
+tr:not(.editing) .shipping:hover .note-text,
+tr:not(.editing) .extra:hover .note-text {
     display: block;
 }
- 
-.extra .edit-input,
-.shipping .edit-input {
-  width: 70px;
-  padding: 2px 6px;
-  font-size: 13px;
+
+.edit-block {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.edit-block.hidden {
+    display: none;
+}
+
+.edit-label {
+    font-size: 0.7rem;
+    color: #999;
+    line-height: 1;
+    margin-top: 2px;
+}
+
+.edit-block .edit-input,
+.edit-block .edit-mini-note {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 3px 5px;
+    margin: 0;
 }
 
 .edit-mini-note {
-  font-size: 12px;
-  color: #666;
+  font-size: 0.85rem;
+  color: #555;
+}
+
+.edit-mini-note::placeholder {
+  color: #999;
 }
 
 .status {
@@ -282,6 +312,16 @@ tr:has(.shipping.editable):has(.status:hover) .status {
     width: 120px;
 }
 
+table tbody tr.editing {
+    background-color: #f5f9fc;
+    outline: 1px solid #c5ddee;
+    outline-offset: -1px;
+}
+
+table tbody tr.editing:hover {
+    background-color: #f5f9fc;
+}
+
 tr.selected {
     outline: 1px solid #3e8bb8;
     background-color: #e7f1f8;
@@ -300,6 +340,13 @@ tfoot td {
 #total-amount {
     font-size: 1rem;
     cursor: pointer;
+    text-align: left;
+    position: relative;
+}
+
+#total-amount .total-popover {
+    bottom: 100%;
+    left: 0;
 }
 
 .merge-bar {
