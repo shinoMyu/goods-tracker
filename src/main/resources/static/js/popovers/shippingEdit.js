@@ -40,13 +40,17 @@ document.querySelectorAll(".shipping").forEach(cell => {
       cell.querySelector(".text").textContent = fee;
       const noteText = cell.querySelector(".note-text");
       if (noteText) noteText.textContent = note;
+      cell.classList.toggle("has-note", note.trim() !== "");
 
       popover.remove();
 
       const row = cell.closest("tr");
       const status = row.querySelector(".status");
+      row.dataset.shipping = fee;
       status.dataset.shipping = fee;
       updateRowUI(row);
+
+      if (typeof renderTotal === "function") renderTotal();
     };
   });
 });

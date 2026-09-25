@@ -230,31 +230,12 @@ function applyCellUpdate(cell, body) {
   }
 }
 
-function shouldWarnShippingChange(cell, body) {
-  if (!cell.classList.contains("shipping")) return false;
-  if (body.shipping === undefined) return false;
-
-  const text = cell.querySelector(".text");
-  const oldValue = (text?.textContent || "").trim();
-  return oldValue !== "";
-}
-
 async function saveCell(cell, row) {
   const { changed, body } = buildPayload(cell);
   if (!changed) return false;
 
   const endpoint = resolveEndpoint(cell, row);
   if (!endpoint) return false;
-
-  if (shouldWarnShippingChange(cell, body)) {
-    const ok = confirm("修改郵費會影響總額，確定要改嗎？");
-    if (!ok) {
-      const input = cell.querySelector(".edit-input");
-      input.value = cell.querySelector(".text").textContent.trim();
-      delete body.shipping;
-      if (Object.keys(body).length === 0) return false;
-    }
-  }
 
   await api(endpoint.url, body, endpoint.method);
 

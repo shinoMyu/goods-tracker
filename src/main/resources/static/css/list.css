@@ -306,6 +306,11 @@ tr:has(.shipping.editable):has(.status:hover) .status {
     width: 120px;
 }
 
+.extra-col {
+    font-size: 0.8rem;
+    color: #686a6d;
+}
+
 table tbody tr.editing {
     background-color: #f5f9fc;
     outline: 1px solid #c5ddee;
