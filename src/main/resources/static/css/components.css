@@ -117,6 +117,14 @@ input[type="color"] {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
+.payment-popover {
+    font-size: 0.8rem;
+}
+
+.total-popover {
+    font-size: 0.9rem;
+}
+
 .shipping-popover {
     display: flex;
     flex-direction: column;
@@ -207,8 +215,4 @@ input[type="color"] {
 
 .app-toast.info {
     background: #3e8bb8;
-}
-
-.status {
-    position: relative;
 }

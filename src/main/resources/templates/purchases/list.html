@@ -99,8 +99,9 @@
         
         <td class="status tooltip"
             th:attr="data-order=${p.order?.id}, data-received=${p.received},
-              data-shipping=${p.order?.shippingFee}, data-color=${p.order?.color}"
-              ><span class="shippingMark" th:if="${p.received}">✓</span></td>
+                     data-shipping=${p.order?.shippingFee}, data-color=${p.order?.color}">
+          <span class="shippingMark" th:if="${p.received}">✓</span>
+        </td>
         <td class="category-col" th:text="${p.category}"></td>
         <td class="action-col">
           <button class="edit-btn hidden">Edit</button>
@@ -126,6 +127,7 @@
   </table>
 
   <script th:src="@{/js/utils/menu.js}" defer></script>
+  <script th:src="@{/js/utils/api.js}" defer></script>
   <script th:src="@{/js/utils/ui-utils.js}" defer></script>
   <script th:src="@{/js/features/total.js}" defer></script>
   <script th:src="@{/js/modes/mergeMode.js}" defer></script>

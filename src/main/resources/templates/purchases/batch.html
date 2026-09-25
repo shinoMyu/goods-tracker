@@ -63,7 +63,7 @@
       <button type="submit">儲存</button>
     </form>
 
-    <div id="template" class="item-row" style="display:none">
+    <div id="template" class="item-row hidden">
       <div class="item-index"></div>
       <div class="form-error"></div>
 
@@ -91,12 +91,12 @@
       <div class="form-group">
         <label>金額</label>
         <input type="number" step="0.01" min="0" class="amountInput" data-field="totalPrice">
-        <div class="installmentBox" style="display:none">
+        <div class="installmentBox hidden">
           <input type="number" step="0.01" min="0" class="depositInput" data-field="deposit" placeholder="訂金">
           <input type="number" step="0.01" min="0" class="balanceInput" data-field="balance" placeholder="尾款">
           <div class="total">總金額：<span class="totalPreview">0</span></div>
         </div>
-        <div class="paymentOptions" style="display:none">
+        <div class="paymentOptions hidden">
           <label><input type="radio" data-field="payMode" value="single" checked>一次付款</label>
           <label><input type="radio" data-field="payMode" value="deposit">只有訂金</label>
           <label><input type="radio" data-field="payMode" value="installment">分期</label>
@@ -114,6 +114,7 @@
   <script th:inline="javascript">
     const serverItems = [[${request.items}]];
   </script>
+  <script th:src="@{/js/utils/api.js}" defer></script>
   <script th:src="@{/js/utils/ui-utils.js}" defer></script>
   <script th:src="@{/js/batch/paymentRow.js}" defer></script>
   <script th:src="@{/js/batch/batch.js}" defer></script>

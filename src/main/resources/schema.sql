@@ -2,7 +2,8 @@ CREATE TABLE IF NOT EXISTS orders (
 	id INT AUTO_INCREMENT PRIMARY KEY,
     shipping_fee DECIMAL(10,2),
     color VARCHAR(20),
-    shipping_note VARCHAR(255)
+    shipping_note VARCHAR(255),
+    no_shipping BOOLEAN DEFAULT FALSE
 );
 
 CREATE TABLE IF NOT EXISTS work (
