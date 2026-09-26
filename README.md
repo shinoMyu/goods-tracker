@@ -1,21 +1,35 @@
 # Merch Purchase Tracker
 
-A personal system for tracking merchandise purchases, shipping status, and payment breakdown.
+A personal web application for tracking merchandise purchases, payment details, shipping status, and purchase history.
 
-This project was built to manage long-term collections of anime / character goods and keep track of purchase history, shipping groups, and costs.
+This project was built to manage long-term collections of anime, character goods, and more while making it easier to track purchases, shipping groups, payment sources, and total costs.
 
 ---
+## Live Demo
+
+The application is currently deployed on Railway and can be accessed here:
+
+[https://goods-tracker-production.up.railway.app/purchases/view](https://goods-tracker-production.up.railway.app/purchases/view)
+
+> Note: The live demo is provided for demonstration purposes and may not be permanently available.
 
 ## Features
 
 - Track merchandise purchases
 - Organize purchases by **work (series)**
-- Color tagging system to group items by work
-- Confirmation popover before locking work color
-- Record payment breakdowns (e.g. deposits and remaining payments)
+- Color tagging system to identify works
+- Confirmation before locking a work color
+- Record payment breakdowns, including deposits and installment payments
 - Payment breakdown popover on the purchase list
 - Payment source tracking
-- Shipping grouping with visual indicators
+- Shipping fee management
+- Group purchases that arrive in the same shipment
+- Visual indicators for received items and grouped shipments
+- Edit purchase information
+- Batch purchase creation
+- Notes for purchase entries
+- Bilingual operation guide (Chinese / Japanese)
+- Calculate and display the total purchase amount
 
 ---
 
@@ -34,6 +48,8 @@ Frontend
 - JavaScript
 - HTML / CSS
 
+Deployment
+- Railway
 ---
 
 ## Database Structure
@@ -49,6 +65,31 @@ Relationships:
 
 - One **Work** → many **Purchases**
 - One **Purchase** → many **Payments**
+
+---
+
+## Project Structure
+
+The project is organized into separate layers and feature modules.
+
+```
+src/
+├── main/
+│   ├── java/
+│   │   └── com/example/goods_tracker/
+│   │       ├── controller/
+│   │       ├── service/
+│   │       ├── repository/
+│   │       └── entity/
+│   └── resources/
+│       ├── static/
+│       │   ├── css/
+│       │   └── js/
+│       └── templates/
+└── ...
+```
+
+The JavaScript code is also divided by feature to keep the frontend easier to maintain.
 
 ---
 
@@ -70,15 +111,17 @@ CREATE DATABASE goods_tracker;
 
 ```
 
-3. Configure database in `application.properties`
+3. Configure the database
+
+Configure the following properties in `src/main/resources/application.properties`:
 
 ```
-
 spring.datasource.url=jdbc:mysql://localhost:3306/goods_tracker
 spring.datasource.username=YOUR_USERNAME
 spring.datasource.password=YOUR_PASSWORD
-
 ```
+
+The project also supports environment variables (`DATABASE_URL`, `DATABASE_USERNAME`, `DATABASE_PASSWORD`) for database configuration when deployed.
 
 4. Start the application
 
@@ -106,18 +149,23 @@ Example data can be inserted manually using:
 database/sample_data.sql
 
 ```
-One work includes a preset color while another can be used to test the color tagging feature.
+One work includes a preset color and can be used to test the purchase list and color-tagging features.
 
 ---
 
 ## Future Improvements
 
-This project is still under development and continues to evolve as features are added.
+This project is still under development.
 
-Planned features:
+Planned improvements include:
 
-- Batch purchase creation
-- Shipping fee management
+- Add remaining payments after selecting a deposit-only payment
 - Work-based purchase view
-- Edit purchase entries
-- Improved UI for select inputs
+- Additional tables for managing purchases and sales
+- Further improvements to the purchase and payment UI
+
+---
+
+## Version
+
+Current version: v1.0
