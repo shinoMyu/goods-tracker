@@ -3,6 +3,11 @@
     src: url(../fonts/jf-openhuninn-21.woff2);
 }
 
+@font-face {
+    font-family: "MyFontJa";
+    src: url(../fonts/KiwiMaru-Regular.woff2);
+}
+
 body {
     font-family: "MyFont";
     background-color: #f7f7f7;

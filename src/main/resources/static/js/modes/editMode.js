@@ -284,6 +284,17 @@ function bindRowEvents() {
     };
 
     saveBtn.onclick = async () => {
+      const extraCell = row.querySelector(".extra");
+      const extraBlock = extraCell?.querySelector(".edit-block");
+      if (extraBlock && !extraBlock.classList.contains("hidden")) {
+        const hasAmount = extraCell.querySelector(".edit-input").value.trim() !== "";
+        const hasNote = extraCell.querySelector(".edit-mini-note").value.trim() !== "";
+        if (hasAmount !== hasNote) {
+          showToast("金額和說明必須同時填入");
+          return;
+        }
+      }
+
       let anyChange = false;
       for (const cell of row.querySelectorAll(".edit-cell")) {
         const changed = await saveCell(cell, row);

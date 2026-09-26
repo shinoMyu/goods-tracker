@@ -14,6 +14,7 @@
     <h1>グッズ購買紀錄</h1>
     <div class="actions">
       <a href="/purchases/new" class="btn-add">新增購買</a>
+      <button id="guideBtn" class="btn-more" title="說明">?</button>
       <div id="menu" class="menu">
         <button id="moreBtn" class="btn-more">⋯</button>
         <div class="dropdown">
@@ -137,9 +138,25 @@
   <script th:src="@{/js/popovers/shippingEdit.js}" defer></script>
   <script th:src="@{/js/features/status.js}" defer></script>
   <script th:src="@{/js/modes/editMode.js}" defer></script>
+  <script th:src="@{/js/data/operationGuideData.js}" defer></script>
+  <script th:src="@{/js/features/operationGuide.js}" defer></script>
 
   <datalist id="extraNotesList">
     <option th:each="note : ${extraNotes}" th:value="${note}"></option>
   </datalist>
+
+  <div id="guideModal" class="hidden">
+    <div class="guide-box">
+      <div class="guide-header">
+        <h2 id="guideTitle"></h2>
+        <div class="guide-lang">
+          <button data-lang="zh">中文</button>
+          <button data-lang="ja">日本語</button>
+        </div>
+        <button class="guide-close" id="guideClose">✕</button>
+      </div>
+      <div id="guideContent"></div>
+    </div>
+  </div>
 </body>
 </html>
