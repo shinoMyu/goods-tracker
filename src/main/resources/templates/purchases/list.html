@@ -73,7 +73,8 @@
           data-source=${p.paymentSource},data-type=${p.purchaseType}"
           th:text="${p.totalPrice.stripTrailingZeros().toPlainString()}"></td>
 
-        <td class="extra edit-cell" data-field="extra">
+        <td class="extra edit-cell" data-field="extra"
+            th:classappend="${!#strings.isEmpty(#strings.trim(extraMap[p.id]?.note))} ? 'has-note'">
           <span class="text" th:text="${extraMap[p.id]?.paidAmount != null ? extraMap[p.id].paidAmount.stripTrailingZeros().toPlainString() : ''}"></span>
           <div class="edit-block hidden">
             <label class="edit-label">金額</label>
