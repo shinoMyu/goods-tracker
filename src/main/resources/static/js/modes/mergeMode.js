@@ -66,7 +66,7 @@ document.querySelectorAll("tbody tr").forEach(row => {
 
       const shipping = row.querySelector(".shipping");
       if (shipping.dataset.noShipping === "true") return;
-      if (shipping.textContent.trim() !== "") return;
+      if (shipping.querySelector(".text").textContent.trim() !== "") return;
 
       const orderCount = parseInt(shipping.dataset.orderCount);
       if (orderCount > 1) return;
