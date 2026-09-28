@@ -51,7 +51,8 @@ public class OrderService {
             return;
 
         if (body.containsKey("shipping")) {
-            order.setShippingFee(new BigDecimal(body.get("shipping")));
+            String fee = body.get("shipping");
+            order.setShippingFee(fee == null || fee.isBlank() ? null : new BigDecimal(fee));
         }
 
         if (body.containsKey("shippingNote")) {
