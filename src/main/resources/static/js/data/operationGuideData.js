@@ -237,7 +237,7 @@ const operationGuideData = {
             ]
           },
           {
-            title: "状態の色",
+            title: "注文の色",
             items: [
               "まとめて管理機能と連動しています。"
             ]

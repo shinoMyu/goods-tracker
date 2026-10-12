@@ -226,4 +226,13 @@ public class PurchaseViewController {
         Purchase purchase = purchaseRepository.findById(id).orElseThrow();
         paymentService.updateExtra(purchase, body);
     }
+
+    @PutMapping("/{id}/balance")
+    @ResponseBody
+    public void addBalance(@PathVariable Integer id,
+                           @RequestBody Map<String, String> body) {
+        Purchase purchase = purchaseRepository.findById(id).orElseThrow();
+        BigDecimal balance = new BigDecimal(body.get("balance"));
+        paymentService.addBalance(purchase, balance);
+    }
 }

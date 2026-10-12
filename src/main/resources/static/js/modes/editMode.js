@@ -27,7 +27,7 @@ function resetRow(row) {
   row.querySelectorAll(".edit-cell").forEach(cell => {
     const { text, input, textarea, noteBtn, noteText, miniNoteInput } = getParts(cell);
 
-    if (cell.classList.contains("extra") || cell.classList.contains("shipping")) {
+    if (cell.classList.contains("extra") || cell.classList.contains("shipping") || cell.classList.contains("amount")) {
       text.classList.remove("hidden");
       const editBlock = cell.querySelector(".edit-block");
       if (editBlock) editBlock.classList.add("hidden");
@@ -90,6 +90,7 @@ function render() {
     const { noteBtn } = getParts(nameCol);
     const hasNote = (nameCol.dataset.note || "").trim() !== "";
 
+    const amountCol = row.querySelector(".amount");
     const extraCol = row.querySelector(".extra");
     const shippingCol = row.querySelector(".shipping");
     const statusCol = row.querySelector(".status");
@@ -104,6 +105,11 @@ function render() {
 
     if (state === "editing") {
       nameCol.dataset.tip = "雙擊修改名稱";
+      if (amountCol.dataset.depositOnly === "true") {
+        amountCol.dataset.tip = "雙擊添加尾款";
+      } else {
+        amountCol.removeAttribute("data-tip");
+      }
       const extraText = extraCol.querySelector(".text");
       const hasExtra = (extraText?.textContent || "").trim() !== "";
       extraCol.dataset.tip = hasExtra ? "雙擊修改額外費用" : "雙擊新增額外費用";
@@ -115,13 +121,9 @@ function render() {
       } else {
         shippingCol.removeAttribute("data-tip");
       }
-    } else if (state === "view") {
+    } else {
       nameCol.removeAttribute("data-tip");
-      extraCol.removeAttribute("data-tip");
-      shippingCol.removeAttribute("data-tip");
-      statusCol.removeAttribute("data-tip");
-    } else if (state === "locked") {
-      nameCol.removeAttribute("data-tip");
+      amountCol.removeAttribute("data-tip");
       extraCol.removeAttribute("data-tip");
       shippingCol.removeAttribute("data-tip");
       statusCol.removeAttribute("data-tip");
@@ -143,8 +145,8 @@ function buildPayload(cell) {
   const { text, input, textarea, noteText, miniNoteInput } = getParts(cell);
   const payload = { changed: false, body: {} };
 
-  const isExtraOrShipping = cell.classList.contains("extra") || cell.classList.contains("shipping");
-  const blockHidden = isExtraOrShipping
+  const hasEditBlock = cell.classList.contains("extra") || cell.classList.contains("shipping") || cell.classList.contains("amount");
+  const blockHidden = hasEditBlock
     ? cell.querySelector(".edit-block")?.classList.contains("hidden")
     : input?.classList.contains("hidden");
 
@@ -152,7 +154,12 @@ function buildPayload(cell) {
     const newValue = input.value.trim();
     const oldValue = (text.textContent || "").trim();
 
-    if (newValue !== oldValue) {
+    if (cell.classList.contains("amount")) {
+      if (newValue) {
+        payload.body[cell.dataset.field] = newValue;
+        payload.changed = true;
+      }
+    } else if (newValue !== oldValue) {
       payload.body[cell.dataset.field] = newValue;
       payload.changed = true;
     }
@@ -167,7 +174,7 @@ function buildPayload(cell) {
     }
   }
 
-  if (isExtraOrShipping && miniNoteInput && !blockHidden) {
+  if ((cell.classList.contains("extra") || cell.classList.contains("shipping")) && miniNoteInput && !blockHidden) {
     const newNote = miniNoteInput.value;
     const oldNote = (noteText?.textContent || "").trim();
     if (newNote !== oldNote) {
@@ -184,6 +191,9 @@ function resolveEndpoint(cell, row) {
   if (cell.classList.contains("name-col")) {
     return { url: `/purchases/${row.dataset.id}`, method: "PUT" };
   }
+  if (cell.classList.contains("amount")) {
+    return { url: `/purchases/${row.dataset.id}/balance`, method: "PUT" };
+  }
   if (cell.classList.contains("shipping")) {
     const orderId = cell.dataset.order;
     if (!orderId) return null;
@@ -197,6 +207,20 @@ function resolveEndpoint(cell, row) {
 
 function applyCellUpdate(cell, body) {
   const { text, textarea, noteText, miniNoteInput } = getParts(cell);
+
+  if (cell.classList.contains("amount") && body.balance !== undefined) {
+    const oldPrice = parseFloat(cell.dataset.price);
+    const balance = parseFloat(body.balance);
+    const newTotal = oldPrice + balance;
+
+    text.textContent = newTotal;
+    cell.dataset.price = newTotal;
+    cell.closest("tr").dataset.price = newTotal;
+    delete cell.dataset.depositOnly;
+
+    if (typeof renderTotal === "function") renderTotal();
+    return;
+  }
 
   if (body[cell.dataset.field] !== undefined) {
     text.textContent = body[cell.dataset.field];
@@ -227,6 +251,7 @@ function applyCellUpdate(cell, body) {
     const status = row.querySelector(".status");
     status.dataset.shipping = body.shipping;
     updateRowUI(row);
+    if (typeof renderTotal === "function") renderTotal();
   }
 }
 
@@ -371,6 +396,17 @@ function enterEdit(cell) {
   const input = cell.querySelector(".edit-input");
 
   if (!text || !input) return;
+
+  if (cell.classList.contains("amount")) {
+    if (cell.dataset.depositOnly !== "true") return;
+
+    const editBlock = cell.querySelector(".edit-block");
+    if (editBlock) {
+      editBlock.classList.remove("hidden");
+      input.focus();
+    }
+    return;
+  }
 
   if (cell.classList.contains("shipping")) {
     const row = cell.closest("tr");

@@ -90,15 +90,7 @@ confirmMergeBtn.addEventListener("click", async () => {
       return;
     }
   
-    const res = await fetch("/orders/group", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(selectedIds)
-    });
-
-    const order = await res.json();
+    const order = await api("/orders/group", selectedIds);
     const orderId = order.id;
 
     markMergedRows(orderId);

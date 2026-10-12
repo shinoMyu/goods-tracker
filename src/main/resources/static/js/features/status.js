@@ -8,13 +8,7 @@ document.querySelectorAll(".status").forEach(cell => {
 
         if (cell.textContent.trim() !== "✓") {
             // 更新 DB
-            await fetch(`/purchases/${id}/received`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ received: true })
-            });
+            await api(`/purchases/${id}/received`, { received: true });
 
             // 更新 UI
             cell.textContent = "✓";

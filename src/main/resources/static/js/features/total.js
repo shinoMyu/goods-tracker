@@ -1,5 +1,5 @@
 // 總計：商品金額（逐筆）+ 額外費用（逐筆）+ 郵費（每個訂單只算一次）
-// noShipping 的訂單不計郵費（
+// noShipping 的訂單不計郵費
 
 function calculateTotals() {
   let itemTotal = 0;

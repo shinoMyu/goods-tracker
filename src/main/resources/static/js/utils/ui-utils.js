@@ -12,11 +12,15 @@ function createPopover(target, html, className = "popover") {
 
 function enablePopoverAutoClose() {
   document.addEventListener("click", (e) => {
+    const trigger = e.target.closest("[data-popover-trigger], .work-color, .status.merge-pending");
+
     document.querySelectorAll(".payment-popover, .note-popover, .shipping-popover, .total-popover").forEach(p => {
-      if (!p.contains(e.target) && !e.target.closest("[data-popover-trigger]")) {
-        p.remove();
-      }
+      if (!p.contains(e.target) && !trigger) p.remove();
     });
+
+    if (currentPopover && !currentPopover.contains(e.target) && !trigger) {
+      closePopover();
+    }
   });
 }
 
@@ -92,16 +96,6 @@ function showConfirm(element, onConfirm, pos = "below") {
     closePopover(); 
   };
 }
-
-document.addEventListener("click", (e) => {
-  const isPopover = e.target.closest(".color-popover");
-  const isWork = e.target.closest(".work-color");
-  const isEditableStatus = e.target.closest(".status.merge-pending");
-
-  if (!isPopover && !isWork && !isEditableStatus) {
-    closePopover();
-  }
-});
 
 function setEditable(shipping, enabled) {
   if (enabled) {

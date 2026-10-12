@@ -19,7 +19,11 @@ async function initDepositLabel(cell, id) {
 
     if (payments.length === 1 && payments[0].paymentType === "deposit") {
         const price = cell.dataset.price;
-        cell.textContent = price + "(訂金)";
+        const text = cell.querySelector(".text");
+        if (text) {
+            text.textContent = price + "(訂金)";
+        }
+        cell.dataset.depositOnly = "true";
     }
 }
 
@@ -64,10 +68,8 @@ document.querySelectorAll(".amount").forEach(cell => {
     cell.setAttribute("data-popover-trigger", "");
 
     cell.addEventListener("click", () => {
+        if (typeof isEditMode !== "undefined" && isEditMode
+            && typeof editingRow !== "undefined" && editingRow === cell.closest("tr")) return;
         showPopover(cell, id);
     });
-});
-
-document.addEventListener("DOMContentLoaded", () => {
-  enablePopoverAutoClose();
 });

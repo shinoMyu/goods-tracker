@@ -31,11 +31,7 @@ document.querySelectorAll(".shipping").forEach(cell => {
       }
       const note = noteInput.value.trim();
 
-      await fetch(`/orders/${orderId}/shipping`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ shipping: fee, shippingNote: note })
-      });
+      await api(`/orders/${orderId}/shipping`, { shipping: fee, shippingNote: note }, "PUT");
 
       cell.querySelector(".text").textContent = fee;
       const noteText = cell.querySelector(".note-text");

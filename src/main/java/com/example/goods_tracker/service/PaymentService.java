@@ -3,6 +3,7 @@ package com.example.goods_tracker.service;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import com.example.goods_tracker.entity.*;
 import com.example.goods_tracker.repository.*;
@@ -15,9 +16,12 @@ import lombok.Getter;
 public class PaymentService {
 
     private final PaymentRepository paymentRepository;
+    private final PurchaseRepository purchaseRepository;
 
-    public PaymentService(PaymentRepository paymentRepository) {
+    public PaymentService(PaymentRepository paymentRepository,
+                          PurchaseRepository purchaseRepository) {
         this.paymentRepository = paymentRepository;
+        this.purchaseRepository = purchaseRepository;
     }
 
     public List<Payment> getPaymentsByPurchaseId(Integer purchaseId) {
@@ -72,20 +76,34 @@ public class PaymentService {
             BigDecimal balance) {
 
         if (!"single".equals(payMode)) {
-            Payment p = new Payment();
-            p.setPurchase(purchase);
-            p.setPaymentType("deposit");
-            p.setPaidAmount(deposit);
-            paymentRepository.save(p);
+            createPayment(purchase, "deposit", deposit);
         }
 
         if ("installment".equals(payMode)) {
-            Payment p = new Payment();
-            p.setPurchase(purchase);
-            p.setPaymentType("balance");
-            p.setPaidAmount(balance);
-            paymentRepository.save(p);
+            createPayment(purchase, "balance", balance);
         }
+    }
+
+    private Payment createPayment(Purchase purchase, String type, BigDecimal amount) {
+        Payment p = new Payment();
+        p.setPurchase(purchase);
+        p.setPaymentType(type);
+        p.setPaidAmount(amount);
+        return paymentRepository.save(p);
+    }
+
+    public void addBalance(Purchase purchase, BigDecimal balance) {
+        Optional<Payment> existingBalance = paymentRepository
+                .findByPurchaseIdAndPaymentType(purchase.getId(), "balance");
+        if (existingBalance.isPresent()) {
+            throw new IllegalStateException("尾款已存在");
+        }
+
+        createPayment(purchase, "balance", balance);
+
+        BigDecimal newTotal = purchase.getTotalPrice().add(balance);
+        purchase.setTotalPrice(newTotal);
+        purchaseRepository.save(purchase);
     }
 
     public void updateExtra(Purchase purchase, Map<String, String> body) {
