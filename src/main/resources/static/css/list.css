@@ -188,6 +188,7 @@ table tbody tr:hover {
 .amount {
     cursor: pointer;
     width: 95px;
+    position: relative;
 }
 
 .extra {
